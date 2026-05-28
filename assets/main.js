@@ -1,0 +1,129 @@
+(function () {
+  'use strict';
+
+  // ===== 1. Scroll-spy + sticky header tint =====
+  const header = document.getElementById('site-header');
+  const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+  const sections = navLinks
+    .map(link => document.getElementById(link.dataset.section))
+    .filter(Boolean);
+
+  const setActiveNav = (id) => {
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.dataset.section === id);
+    });
+  };
+
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+        setActiveNav(entry.target.id);
+      }
+    });
+  }, { threshold: [0.5] });
+  sections.forEach(s => spy.observe(s));
+
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  // ===== 2. Mobile nav toggle =====
+  const navToggle = document.querySelector('.nav-toggle');
+  const navList = document.getElementById('nav-list');
+  navToggle.addEventListener('click', () => {
+    const open = navList.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  navLinks.forEach(link => link.addEventListener('click', () => {
+    navList.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }));
+
+  // ===== 3. Entrance animations =====
+  const animateObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        animateObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('[data-animate]').forEach(el => animateObserver.observe(el));
+
+  // ===== 4. Footer year =====
+  const yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // ===== 5. Publications renderer =====
+  const pubList = document.getElementById('pub-list');
+  const statTotal = document.getElementById('stat-total');
+  const statFirst = document.getElementById('stat-first');
+  const pubs = window.PUBLICATIONS || [];
+
+  if (statTotal) statTotal.textContent = String(pubs.length);
+  if (statFirst) statFirst.textContent = String(pubs.filter(p => p.firstAuthor || p.coFirst).length);
+
+  if (pubList && pubs.length) {
+    const byYear = {};
+    pubs.forEach(p => { (byYear[p.year] = byYear[p.year] || []).push(p); });
+    const years = Object.keys(byYear).map(Number).sort((a, b) => b - a);
+
+    const frag = document.createDocumentFragment();
+    years.forEach(year => {
+      const heading = document.createElement('li');
+      heading.className = 'pub-year';
+      heading.textContent = year;
+      frag.appendChild(heading);
+
+      byYear[year].forEach(p => {
+        const li = document.createElement('li');
+        li.className = 'pub-item'
+          + (p.firstAuthor ? ' first-author' : '')
+          + (p.coFirst ? ' co-first' : '');
+
+        const title = document.createElement('div');
+        title.className = 'pub-title';
+        const a = document.createElement('a');
+        a.href = p.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = p.title;
+        title.appendChild(a);
+
+        const authors = document.createElement('div');
+        authors.className = 'pub-authors';
+        authors.innerHTML = escapeHtml(p.authors).replace(/(Zhang X\*?)/g, '<span class="me">$1</span>');
+
+        const meta = document.createElement('div');
+        meta.className = 'pub-meta';
+        const venue = document.createElement('span');
+        venue.textContent = p.venue + ' · ' + p.year + ' · ';
+        const doiLink = document.createElement('a');
+        doiLink.href = p.url;
+        doiLink.target = '_blank';
+        doiLink.rel = 'noopener';
+        doiLink.textContent = 'DOI ↗';
+        meta.appendChild(venue);
+        meta.appendChild(doiLink);
+        if (p.coFirst) {
+          const note = document.createElement('span');
+          note.className = 'pub-cofirst-note';
+          note.textContent = '(CO-FIRST AUTHOR)';
+          meta.appendChild(note);
+        }
+
+        li.appendChild(title);
+        li.appendChild(authors);
+        li.appendChild(meta);
+        frag.appendChild(li);
+      });
+    });
+    pubList.appendChild(frag);
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+  }
+})();

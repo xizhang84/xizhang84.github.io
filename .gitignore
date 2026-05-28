@@ -1,0 +1,12 @@
+# Claude Code local settings (not for public repo)
+.claude/
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
