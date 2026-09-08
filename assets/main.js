@@ -14,13 +14,14 @@
     });
   };
 
+  // A section is "active" while it crosses a thin band 40% down the
+  // viewport. Unlike a 50%-visible threshold this also works for
+  // sections taller than the screen (e.g. the publication list).
   const spy = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-        setActiveNav(entry.target.id);
-      }
+      if (entry.isIntersecting) setActiveNav(entry.target.id);
     });
-  }, { threshold: [0.5] });
+  }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
   sections.forEach(s => spy.observe(s));
 
   window.addEventListener('scroll', () => {
