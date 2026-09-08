@@ -85,7 +85,39 @@
       }
     });
   }, { threshold: 0.2 });
+  // siblings inside a grid reveal one after another
+  document.querySelectorAll('.research-grid, .contact-grid, .cv-grid, .skills-grid').forEach(grid => {
+    Array.from(grid.children).forEach((child, i) => {
+      const el = child.matches('[data-animate]') ? child : child.querySelector('[data-animate]');
+      if (!el) return;
+      el.style.transitionDelay = (i * 90) + 'ms';
+      el.addEventListener('transitionend', () => { el.style.transitionDelay = ''; }, { once: true });
+    });
+  });
   document.querySelectorAll('[data-animate]').forEach(el => animateObserver.observe(el));
+
+  // ===== 3b. Card tilt (pointer devices only) =====
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (finePointer && !reduceMotion) {
+    const MAX_TILT = 5; // degrees
+    document.querySelectorAll('.research-card, .contact-card').forEach(card => {
+      card.classList.add('tilt');
+      card.addEventListener('pointerenter', () => card.classList.add('is-tilting'));
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;   // -0.5 .. 0.5
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--ry', (px * MAX_TILT * 2).toFixed(2) + 'deg');
+        card.style.setProperty('--rx', (-py * MAX_TILT * 2).toFixed(2) + 'deg');
+      });
+      card.addEventListener('pointerleave', () => {
+        card.classList.remove('is-tilting');
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+      });
+    });
+  }
 
   // ===== 4. Footer year =====
   const yearEl = document.getElementById('year');
@@ -97,8 +129,34 @@
   const statFirst = document.getElementById('stat-first');
   const pubs = window.PUBLICATIONS || [];
 
-  if (statTotal) statTotal.textContent = String(pubs.length);
-  if (statFirst) statFirst.textContent = String(pubs.filter(p => p.firstAuthor || p.coFirst).length);
+  const totalCount = pubs.length;
+  const firstCount = pubs.filter(p => p.firstAuthor || p.coFirst).length;
+  if (statTotal) statTotal.textContent = String(totalCount);
+  if (statFirst) statFirst.textContent = String(firstCount);
+
+  // count the numbers up when the stats bar scrolls into view
+  const statsBar = document.querySelector(".pub-stats");
+  if (statsBar && statTotal && statFirst && !reduceMotion) {
+    const countUp = (el, target, duration) => {
+      const start = performance.now();
+      const tick = (now) => {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = String(Math.round(target * eased));
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    // numbers stay at their real values until the bar is in view,
+    // then drop to 0 and count up (so nothing is lost if IO never fires)
+    const statsObserver = new IntersectionObserver((entries) => {
+      if (!entries.some(en => en.isIntersecting)) return;
+      countUp(statTotal, totalCount, 1100);
+      countUp(statFirst, firstCount, 900);
+      statsObserver.disconnect();
+    }, { threshold: 0.5 });
+    statsObserver.observe(statsBar);
+  }
 
   if (pubList && pubs.length) {
     const byYear = {};
