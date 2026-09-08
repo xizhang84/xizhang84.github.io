@@ -2,6 +2,12 @@
 
 Single-page academic site built with plain HTML, CSS, and JavaScript. Deploys to GitHub Pages at https://xizhang84.github.io/.
 
+Design notes:
+
+- **Warm light / dark themes.** All colors are CSS variables in `assets/styles.css` (`:root` for light, `:root[data-theme="dark"]` for dark). The sun/moon button in the nav toggles them; the choice is remembered in `localStorage` and the OS preference is used until the visitor picks one.
+- **Animated PET ring.** `assets/pet-ring.js` draws a ring of scintillator crystals around the portrait on a `<canvas>`. Annihilation events emit back-to-back photons that light up the crystals they hit and draw the line of response. Hovering moves the annihilation point to the cursor. Tunable constants are at the top of the file.
+- **Restrained motion.** Cards tilt toward the cursor, buttons and the avatar use a short overshoot spring, publication counts count up on scroll, grid cards reveal with a small stagger. Everything is disabled under `prefers-reduced-motion`.
+
 ## Local preview
 
 Open `index.html` in any modern browser. No build step required.
@@ -9,14 +15,14 @@ Open `index.html` in any modern browser. No build step required.
 If you need a local server (e.g. to test the IntersectionObserver behavior more reliably than `file://`), run any of:
 
 ```powershell
-# Python 3
-python -m http.server 8000
-
-# Node (if installed)
+# Node
 npx serve .
+
+# or Python 3
+python -m http.server 8000
 ```
 
-Then open http://localhost:8000.
+Then open the URL it prints (http://localhost:3000 for `serve`, http://localhost:8000 for Python).
 
 ## Deploy to GitHub Pages
 
@@ -39,18 +45,12 @@ Then open http://localhost:8000.
 | Want to change... | Edit this file |
 |---|---|
 | Bio, headlines, section copy | `index.html` |
-| Visual styling, colors, layout | `assets/styles.css` |
+| Visual styling, layout | `assets/styles.css` |
+| Light / dark color palettes | `assets/styles.css` → `:root` and `:root[data-theme="dark"]` |
+| PET ring animation (speed, event rate, crystal count) | `assets/pet-ring.js` → constants at the top |
 | Publications list | `data/publications.js` |
 | CV PDF download | replace `assets/CV-XiZhang.pdf` |
 | Headshot | replace `assets/profile.jpg` (square crop, 600×600 recommended) |
-
-## TODO placeholders to fill in
-
-Search for `<!-- TODO -->` in `index.html` to find the spots that need real URLs:
-
-- **Google Scholar** profile URL (top of Publications section, and in Contact social row)
-- **ORCID iD** URL (Contact social row)
-- **LinkedIn** URL (Contact social row)
 
 ## File structure
 
@@ -59,7 +59,8 @@ Search for `<!-- TODO -->` in `index.html` to find the spots that need real URLs
 ├── index.html              # Single page, all 5 sections
 ├── assets/
 │   ├── styles.css          # All styles
-│   ├── main.js             # Navigation, animations, publications render
+│   ├── main.js             # Navigation, theme toggle, animations, publications render
+│   ├── pet-ring.js         # Canvas PET detector ring around the portrait
 │   ├── profile.jpg         # Headshot
 │   ├── CV-XiZhang.pdf      # Downloadable CV
 │   └── favicon.svg
