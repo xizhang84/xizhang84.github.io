@@ -9,7 +9,21 @@
   <meta property="og:description" content="Molecular Imaging · PET / SPECT Detector Engineering" />
   <meta property="og:image" content="assets/profile.jpg" />
   <meta property="og:type" content="website" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#FFFBF1" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <script>
+    // Apply saved theme before first paint to avoid a flash.
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (t !== "dark" && t !== "light") {
+          t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -20,6 +34,21 @@
     <div class="container nav-row">
       <a href="#home" class="brand"><span class="brand-dot"></span> Xi Zhang</a>
       <nav id="site-nav" aria-label="Primary">
+        <button class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Toggle light / dark">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <mask id="moon-cut">
+              <rect x="-6" y="-6" width="36" height="36" fill="white" />
+              <circle class="moon-mask" cx="24" cy="8" r="7" fill="black" />
+            </mask>
+            <circle class="sun-core" cx="12" cy="12" r="5" mask="url(#moon-cut)" />
+            <g class="rays">
+              <line x1="12" y1="1.5" x2="12" y2="3.5" /><line x1="12" y1="20.5" x2="12" y2="22.5" />
+              <line x1="1.5" y1="12" x2="3.5" y2="12" /><line x1="20.5" y1="12" x2="22.5" y2="12" />
+              <line x1="4.6" y1="4.6" x2="6" y2="6" /><line x1="18" y1="18" x2="19.4" y2="19.4" />
+              <line x1="4.6" y1="19.4" x2="6" y2="18" /><line x1="18" y1="6" x2="19.4" y2="4.6" />
+            </g>
+          </svg>
+        </button>
         <button class="nav-toggle" aria-expanded="false" aria-controls="nav-list" aria-label="Toggle navigation">
           <span></span><span></span><span></span>
         </button>

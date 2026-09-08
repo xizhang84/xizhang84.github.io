@@ -39,6 +39,43 @@
     navToggle.setAttribute('aria-expanded', 'false');
   }));
 
+  // ===== 2b. Light / dark theme toggle =====
+  const root = document.documentElement;
+  const themeBtn = document.querySelector(".theme-toggle");
+  const themeMeta = document.querySelector("meta[name=theme-color]");
+  const THEME_COLORS = { light: "#FFFBF1", dark: "#16120F" };
+
+  const applyTheme = (theme, animate) => {
+    if (animate) {
+      root.classList.add("theme-transition");
+      setTimeout(() => root.classList.remove("theme-transition"), 400);
+    }
+    root.setAttribute("data-theme", theme);
+    if (themeMeta) themeMeta.setAttribute("content", THEME_COLORS[theme]);
+    if (themeBtn) {
+      themeBtn.setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
+    }
+    document.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
+  };
+
+  applyTheme(root.getAttribute("data-theme") || "light", false);
+
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      try { localStorage.setItem("theme", next); } catch (e) { /* private mode */ }
+      applyTheme(next, true);
+    });
+  }
+
+  // follow the OS setting until the user picks one explicitly
+  const osDark = window.matchMedia("(prefers-color-scheme: dark)");
+  osDark.addEventListener("change", (e) => {
+    let saved = null;
+    try { saved = localStorage.getItem("theme"); } catch (err) {}
+    if (!saved) applyTheme(e.matches ? "dark" : "light", true);
+  });
+
   // ===== 3. Entrance animations =====
   const animateObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
