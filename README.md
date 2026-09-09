@@ -27,6 +27,24 @@ python -m http.server 8000
 
 Then open the URL it prints (http://localhost:3000 for `serve`, http://localhost:8000 for Python).
 
+## Publications sync from Google Scholar
+
+`scripts/update-publications.mjs` keeps `data/publications.js` in step with the Google Scholar profile (`dt6RATUAAAAJ`):
+
+1. Fetches the public profile list once (sorted by date, up to 100 items).
+2. Compares titles with the entries already in `data/publications.js`. **Existing entries are never edited or removed**, so manual fixes (co-first flags, venue abbreviations) survive every sync.
+3. For each new paper, asks Crossref for the DOI, full author list and journal name. If Crossref has no match, the entry links to the Scholar record instead.
+4. Rewrites `data/publications.js` newest-year first and stamps `window.PUBLICATIONS_UPDATED`, which the Publications page shows as "Synced from Google Scholar · date".
+
+arXiv / bioRxiv preprints are skipped by default (pass `--include-preprints` to keep them). Run it locally with:
+
+```powershell
+node scripts/update-publications.mjs --dry-run   # show what would be added
+node scripts/update-publications.mjs             # write data/publications.js
+```
+
+The GitHub Actions workflow `.github/workflows/update-publications.yml` runs the same script every Monday 09:00 UTC (and on demand from the **Actions** tab → *Sync publications from Google Scholar* → *Run workflow*). If it finds new papers it commits `data/publications.js` and GitHub Pages redeploys. Google Scholar has no official API and sometimes blocks automated requests; when that happens the job fails without touching the data, and the next run tries again.
+
 ## Deploy to GitHub Pages
 
 1. Create a new public repository on GitHub named **exactly** `xizhang84.github.io` (root-domain Pages site).

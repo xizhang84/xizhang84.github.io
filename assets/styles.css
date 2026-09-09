@@ -527,6 +527,7 @@ p { color: var(--ink-soft); }
   text-transform: uppercase;
 }
 .stat-link { margin-left: auto; font-family: var(--font-mono); font-size: .82rem; }
+.stat-sync { flex-basis: 100%; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .06em; color: var(--ink-faint); margin-top: -.25rem; }
 
 .pub-list { display: grid; gap: .35rem; }
 .pub-year {

@@ -1,0 +1,39 @@
+name: Sync publications from Google Scholar
+
+on:
+  schedule:
+    # Every Monday 09:00 UTC (05:00 Boston in summer, 04:00 in winter)
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publications-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch Scholar and merge new papers
+        run: node scripts/update-publications.mjs
+
+      - name: Commit and push if anything changed
+        run: |
+          if git diff --quiet -- data/publications.js; then
+            echo "No new publications."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/publications.js
+          git commit -m "chore(publications): sync from Google Scholar"
+          git push

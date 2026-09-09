@@ -1,4 +1,7 @@
 window.PUBLICATIONS = [
+  // 2026
+  { year: 2026, authors: "Zhang X, Sitek A, Sabet H", title: "Neural network-based positioning for a laser processed CsI detector with converging pixels", venue: "J Nucl Med", doi: "", url: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=dt6RATUAAAAJ&citation_for_view=dt6RATUAAAAJ:4TOpqqG69KYC", firstAuthor: true, coFirst: false },
+
   // 2025
   { year: 2025, authors: "Zhang X, Sitek A, Blackberg L, Kupinski M, Furenlid L, Sabet H", title: "Development and Performance Evaluation of a Laser Processed CsI:Tl Detector with Converging Pixels", venue: "IEEE NSS/MIC/RTSD", doi: "10.1109/NSS/MIC/RTSD57106.2025.11286546", url: "https://doi.org/10.1109/NSS/MIC/RTSD57106.2025.11286546", firstAuthor: true, coFirst: false },
   { year: 2025, authors: "Zhang X, Feng Y, Ottensmeyer MP, Sabet H", title: "Modular and Robust PET Platform for Evaluating Detector Configurations", venue: "IEEE NSS/MIC/RTSD", doi: "10.1109/NSS/MIC/RTSD57106.2025.11287227", url: "https://doi.org/10.1109/NSS/MIC/RTSD57106.2025.11287227", firstAuthor: true, coFirst: false },
@@ -45,3 +48,4 @@ window.PUBLICATIONS = [
   { year: 2018, authors: "Ye B, Zhang X, Xie Y, et al.", title: "Experimental studies of the decoding performances of a semi-monolithic scintillator detector", venue: "IEEE NSS/MIC", doi: "10.1109/NSSMIC.2018.8824487", url: "https://doi.org/10.1109/NSSMIC.2018.8824487", firstAuthor: false, coFirst: false },
   { year: 2018, authors: "Yang J, Xie Y, Xie S, Zhang X, et al.", title: "Experimental studies of the performance of different methods in the inter-crystal Compton scatter correction on one-to-one coupled PET detectors", venue: "IEEE NSS/MIC", doi: "10.1109/NSSMIC.2018.8824396", url: "https://doi.org/10.1109/NSSMIC.2018.8824396", firstAuthor: false, coFirst: false },
 ];
+window.PUBLICATIONS_UPDATED = "2026-09-09";

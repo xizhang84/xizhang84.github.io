@@ -159,6 +159,15 @@
   if (statTotal) statTotal.textContent = String(totalCount);
   if (statFirst) statFirst.textContent = String(firstCount);
 
+  // "synced from Google Scholar" note, written by scripts/update-publications.mjs
+  const statsBarEl = document.querySelector(".pub-stats");
+  if (statsBarEl && window.PUBLICATIONS_UPDATED) {
+    const note = document.createElement("span");
+    note.className = "stat-sync";
+    note.textContent = "Synced from Google Scholar · " + window.PUBLICATIONS_UPDATED;
+    statsBarEl.appendChild(note);
+  }
+
   // count the numbers up when the stats bar scrolls into view
   const statsBar = document.querySelector(".pub-stats");
   if (statsBar && statTotal && statFirst && !reduceMotion) {
@@ -222,7 +231,7 @@
         doiLink.href = p.url;
         doiLink.target = '_blank';
         doiLink.rel = 'noopener';
-        doiLink.textContent = 'DOI ↗';
+        doiLink.textContent = p.doi ? 'DOI ↗' : 'Scholar ↗';
         meta.appendChild(venue);
         meta.appendChild(doiLink);
         if (p.coFirst) {
