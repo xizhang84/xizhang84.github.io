@@ -380,7 +380,7 @@ p { color: var(--ink-soft); }
   gap: var(--space-4);
   align-items: center;
 }
-.hero-left h1 { margin-top: .35rem; font-size: clamp(2.2rem, 4vw, 3rem); }
+.hero-left h1 { margin-top: .3rem; font-size: clamp(1.9rem, 3.2vw, 2.5rem); }
 .hero-subtitle {
   font-family: var(--font-mono);
   font-size: .95rem;
@@ -679,7 +679,7 @@ a.contact-card:hover strong { color: var(--teal); }
   margin-bottom: var(--space-2);
 }
 .section-head--compact .section-label { margin-bottom: 0; order: 1; }
-.section-head--compact h2 { font-size: 1.45rem; order: 0; }
+.section-head--compact h2 { font-size: 1.35rem; order: 0; }
 .section-head--compact .section-lede { margin-top: 0; margin-left: auto; font-size: .88rem; color: var(--ink-faint); order: 2; }
 @media (max-width: 900px) { .section-head--compact .section-lede { flex-basis: 100%; margin-left: 0; } }
 .hero-map-hint {
