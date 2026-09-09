@@ -397,7 +397,7 @@ p { color: var(--ink-soft); }
   gap: var(--space-2);
 }
 .hero-visual {
-  --ring-size: 280px;
+  --ring-size: 240px;
   position: relative;
   width: var(--ring-size);
   height: var(--ring-size);
@@ -422,16 +422,16 @@ p { color: var(--ink-soft); }
 }
 .hero-visual:hover .avatar-wrap { transform: rotate(-3deg) scale(1.04); }
 .avatar {
-  width: 180px; height: 180px;
+  width: 156px; height: 156px;
   border-radius: 50%;
   object-fit: cover;
   background: var(--bg-elev);
 }
 .hero-meta {
-  font-size: .9rem;
+  font-size: .85rem;
   color: var(--ink-soft);
   display: grid;
-  gap: .2rem;
+  gap: .1rem;
   text-align: center;
 }
 .hero-meta a { color: var(--ink-soft); }
@@ -973,8 +973,8 @@ a.contact-card:hover strong { color: var(--teal); }
   .hero { padding-top: 6.5rem; }
   .hero-grid { grid-template-columns: 1fr; gap: var(--space-4); }
   .hero-right { order: -1; }
-  .hero-visual { --ring-size: 260px; }
-  .avatar { width: 170px; height: 170px; }
+  .hero-visual { --ring-size: 240px; }
+  .avatar { width: 156px; height: 156px; }
   .research-grid, .cv-grid, .skills-grid, .contact-grid { grid-template-columns: 1fr; }
 }
 
