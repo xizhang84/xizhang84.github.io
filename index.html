@@ -7,7 +7,7 @@
   <meta name="description" content="Xi Zhang, PhD — Postdoctoral Research Fellow at Sabet Lab, Massachusetts General Hospital / Harvard Medical School. Research in PET and SPECT detector engineering, scintillator laser processing, and FPGA-based readout systems." />
   <meta property="og:title" content="Xi Zhang, PhD" />
   <meta property="og:description" content="Molecular Imaging · PET / SPECT Detector Engineering" />
-  <meta property="og:image" content="assets/profile.jpg" />
+  <meta property="og:image" content="assets/avatar.jpg" />
   <meta property="og:type" content="website" />
   <meta name="color-scheme" content="light dark" />
   <meta name="theme-color" content="#16120F" />
@@ -29,6 +29,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" />
   <script type="importmap">
     {
       "imports": {
@@ -86,10 +87,11 @@
     <div id="home" class="view" data-title="Home">
     <section class="section hero">
       <div class="hero-bg" aria-hidden="true"></div>
+      <canvas class="hero-events" aria-hidden="true"></canvas>
       <div class="container hero-grid">
         <div class="hero-left" data-animate>
           <span class="eyebrow">POSTDOCTORAL RESEARCH FELLOW</span>
-          <h1>Xi Zhang, <span class="accent">PhD</span></h1>
+          <h1 class="hero-name">Xi Zhang, <span class="accent">PhD</span></h1>
           <p class="hero-subtitle">Molecular Imaging · PET / SPECT Detector Engineering</p>
           <p class="hero-bio">
             I am a research fellow at the Nuclear Medicine and Molecular Imaging (NMMI) Center, MGH / Harvard Medical School. I simulate, design, build and read out detectors for PET and SPECT, from high-resolution systems with special geometries for cardiac and brain imaging to the femtosecond-laser-processed scintillator crystals that make them possible.
@@ -101,10 +103,58 @@
           </div>
         </div>
         <div class="hero-right" data-animate>
-          <div class="hero-visual" aria-label="Animated PET detector ring around a portrait of Xi Zhang">
-            <canvas class="pet-ring" aria-hidden="true"></canvas>
+          <div class="figure-scene" role="img" aria-label="An illustration of Xi Zhang dressed as a bird swordsman, with a galaxy behind him and a pair of 511 keV photons orbiting him"></div>
+          <div class="avatar-float">
             <div class="avatar-wrap">
-              <img src="assets/profile.jpg" alt="Portrait of Xi Zhang" class="avatar" />
+              <svg class="avatar avatar-svg" viewBox="0 0 200 200" role="img" aria-label="Illustrated portrait of Xi Zhang">
+                <defs>
+                  <clipPath id="av-clip"><circle cx="100" cy="100" r="100"/></clipPath>
+                  <linearGradient id="av-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6EAD2"/><stop offset="1" stop-color="#DECBA6"/></linearGradient>
+                </defs>
+                <g clip-path="url(#av-clip)">
+                  <rect width="200" height="200" fill="url(#av-bg)"/>
+                  <circle cx="100" cy="100" r="86" fill="#EBDDBD" opacity=".5"/>
+                  <!-- shirt -->
+                  <path d="M18 206 C20 160 48 142 74 135 L100 152 L126 135 C152 142 180 160 182 206 Z" fill="#2B3A55"/>
+                  <path d="M74 135 L88 124 L100 152 Z" fill="#3B4D70"/>
+                  <path d="M126 135 L112 124 L100 152 Z" fill="#3B4D70"/>
+                  <path d="M88 124 L100 133 L112 124" fill="none" stroke="#1E2A42" stroke-width="2" stroke-linejoin="round"/>
+                  <line x1="100" y1="152" x2="100" y2="206" stroke="#1E2A42" stroke-width="2"/>
+                  <circle cx="100" cy="166" r="2.3" fill="#E9E4D8"/>
+                  <circle cx="100" cy="184" r="2.3" fill="#E9E4D8"/>
+                  <!-- neck -->
+                  <path d="M85 106 L85 134 Q100 147 115 134 L115 106 Z" fill="#E6B692"/>
+                  <!-- ears -->
+                  <ellipse cx="56" cy="94" rx="7" ry="10" fill="#EFC29E"/>
+                  <ellipse cx="144" cy="94" rx="7" ry="10" fill="#EFC29E"/>
+                  <path d="M56 90 Q54 95 57 99" fill="none" stroke="#D9A382" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M144 90 Q146 95 143 99" fill="none" stroke="#D9A382" stroke-width="1.5" stroke-linecap="round"/>
+                  <!-- face -->
+                  <path d="M100 30 C127 30 147 54 146 90 C145 118 126 136 100 136 C74 136 55 118 54 90 C53 54 73 30 100 30 Z" fill="#F4CBA8"/>
+                  <!-- hair -->
+                  <path d="M54 88 C50 50 72 24 100 24 C128 24 150 50 146 88 C143 76 138 68 130 62 C120 68 108 66 98 58 C90 66 76 68 66 66 C60 72 56 80 54 88 Z" fill="#231E1E"/>
+                  <path d="M66 66 C74 60 84 56 98 58 C90 50 78 52 66 66 Z" fill="#2E2727"/>
+                  <!-- brows -->
+                  <path d="M69 77 Q80 71 92 75" fill="none" stroke="#2A2222" stroke-width="3.2" stroke-linecap="round"/>
+                  <path d="M108 75 Q120 71 131 77" fill="none" stroke="#2A2222" stroke-width="3.2" stroke-linecap="round"/>
+                  <!-- eyes -->
+                  <g class="eye">
+                    <ellipse cx="81" cy="89" rx="7.5" ry="5" fill="#FFFFFF"/>
+                    <g class="iris"><circle cx="81" cy="89.5" r="3.9" fill="#3A2A22"/><circle cx="82.5" cy="88" r="1.2" fill="#FFFFFF"/></g>
+                    <path d="M73.5 88 Q81 82 88.5 88" fill="none" stroke="#2A2222" stroke-width="1.6" stroke-linecap="round"/>
+                  </g>
+                  <g class="eye">
+                    <ellipse cx="119" cy="89" rx="7.5" ry="5" fill="#FFFFFF"/>
+                    <g class="iris"><circle cx="119" cy="89.5" r="3.9" fill="#3A2A22"/><circle cx="120.5" cy="88" r="1.2" fill="#FFFFFF"/></g>
+                    <path d="M111.5 88 Q119 82 126.5 88" fill="none" stroke="#2A2222" stroke-width="1.6" stroke-linecap="round"/>
+                  </g>
+                  <!-- nose, mouth, cheeks -->
+                  <path d="M99 94 Q95 103 100 105" fill="none" stroke="#D9A382" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M89 114 Q100 122 111 114" fill="none" stroke="#B26A56" stroke-width="2.4" stroke-linecap="round"/>
+                  <circle cx="71" cy="105" r="6" fill="#E9967A" opacity=".25"/>
+                  <circle cx="129" cy="105" r="6" fill="#E9967A" opacity=".25"/>
+                </g>
+              </svg>
             </div>
           </div>
           <ul class="hero-meta">
@@ -115,6 +165,7 @@
         </div>
       </div>
     </section>
+    <div class="chain-guide" aria-hidden="true" hidden><span class="chain-guide-pulse"></span></div>
 
     <!-- MAP: one PET event as the site index -->
     <section id="map" class="section map-section">
@@ -246,18 +297,28 @@
     <!-- RESEARCH -->
     <section id="research" class="section view" data-title="Research" hidden>
       <div class="container">
-        <header class="section-head" data-animate>
-          <a href="#home" class="back-link">← Back to the scanner</a>
-          <span class="section-label">01 — Research</span>
+        <header class="section-head section-head--station" data-animate>
+          <div class="section-head-text">
+          <span class="section-label">02 · Annihilation — Research</span>
           <h2>Research Themes</h2>
           <p class="section-lede">I design the detectors that decide what a PET or SPECT scanner can see: the crystal that turns a gamma ray into light, the scanner it sits in, and the electronics that read it out, treated as one system rather than separate parts. Four threads, each with the papers behind it.</p>
+          </div>
+          <aside class="station-card" data-station="research"></aside>
         </header>
         <div class="research-grid">
 
           <article class="card research-card" data-animate>
-            <figure class="research-figure">
-              <img src="assets/figures/liob-csi-array.jpg" alt="Laser-induced optical barrier process and the fabricated 25 by 25 converging-pixel CsI:Tl crystal array" loading="lazy" />
-            </figure>
+            <div class="research-visual" data-demo="liob">
+              <canvas class="research-demo" aria-label="Laser-induced optical barriers: a femtosecond laser writes converging pixel walls into one CsI:Tl crystal; a gamma ray is absorbed and its scintillation light stays inside its pixel until it reaches the SiPMs."></canvas>
+              <figure class="research-figure">
+                <img src="assets/figures/liob-csi-array.jpg" alt="Laser-induced optical barrier process and the fabricated 25 by 25 converging-pixel CsI:Tl crystal array" loading="lazy" />
+              </figure>
+              <div class="visual-tabs" role="group" aria-label="Show demo or paper figure">
+                <button type="button" class="visual-tab is-active" data-show="demo">Demo</button>
+                <button type="button" class="visual-tab" data-show="figure">Figure</button>
+              </div>
+              <span class="demo-caption">Laser writes barriers → γ absorbed → light stays in its pixel. Move the pointer to aim.</span>
+            </div>
             <div class="research-body">
               <h3>Laser-Processed Converging-Pixel CsI:Tl Detectors</h3>
               <p>A femtosecond laser writes optical barriers inside an intact 50 × 50 × 8 mm CsI:Tl crystal, turning it into a 25 × 25 array with no sawing, no reflectors and 100% process yield. The pixels converge from 1.6 mm at the entrance face to 2 mm at the photodetector, so each pixel axis follows the collimator&rsquo;s line of response and depth-of-interaction parallax disappears without any DOI decoding. A four-axis pencil-beam platform calibrates the detector, and maximum-likelihood decoding resolves every pixel where center-of-gravity fails: 1.00 ± 0.42 mm localization accuracy and 11.8% energy resolution at 122 keV.</p>
@@ -272,9 +333,17 @@
           </article>
 
           <article class="card research-card" data-animate>
-            <figure class="research-figure">
-              <img src="assets/figures/dc-spect-scanner.jpg" alt="The DC-SPECT scanner gantry with its ring of laser-processed CsI:Tl detector modules" loading="lazy" />
-            </figure>
+            <div class="research-visual" data-demo="dcspect">
+              <canvas class="research-demo" aria-label="DC-SPECT: 80 collimated CsI:Tl modules on a 230° arc stare at the heart; only photons that pass through a loft hole are counted."></canvas>
+              <figure class="research-figure">
+                <img src="assets/figures/dc-spect-scanner.jpg" alt="The DC-SPECT scanner gantry with its ring of laser-processed CsI:Tl detector modules" loading="lazy" />
+              </figure>
+              <div class="visual-tabs" role="group" aria-label="Show demo or paper figure">
+                <button type="button" class="visual-tab is-active" data-show="demo">Demo</button>
+                <button type="button" class="visual-tab" data-show="figure">Figure</button>
+              </div>
+              <span class="demo-caption">80 collimated modules on a 230° arc. Move the tracer; only photons through a loft hole count.</span>
+            </div>
             <div class="research-body">
               <h3>DC-SPECT: A Cardiac-Dedicated SPECT Scanner</h3>
               <p>Dynamic Cardiac SPECT is a static, body-contouring scanner with about 230° of detector coverage: 80 laser-processed CsI:Tl modules, each behind its own tungsten loft-hole collimator, built for diagnostic and theranostic cardiac imaging. I build and calibrate the modules and produced the scanner&rsquo;s first experimental images. With list-mode MLEM reconstruction, a <sup>57</sup>Co point source and a <sup>99m</sup>Tc triple-line phantom were resolved with FWHM down to 3.55 mm (neural-network decoder) and 4.04 mm (maximum likelihood), comparing MLE and deep-network event positioning under real scanner conditions. The same detector platform serves an NIH-funded dynamic brain SPECT.</p>
@@ -288,9 +357,17 @@
           </article>
 
           <article class="card research-card" data-animate>
-            <figure class="research-figure">
-              <img src="assets/figures/msr-detector.jpg" alt="Monolithic LYSO scintillator ring with its two rings of SiPM sensor boards" loading="lazy" />
-            </figure>
+            <div class="research-visual" data-demo="msr">
+              <canvas class="research-demo" aria-label="Monolithic scintillator ring: no pixels; light from each gamma spreads in the crystal and two rings of SiPMs read out the centroid."></canvas>
+              <figure class="research-figure">
+                <img src="assets/figures/msr-detector.jpg" alt="Monolithic LYSO scintillator ring with its two rings of SiPM sensor boards" loading="lazy" />
+              </figure>
+              <div class="visual-tabs" role="group" aria-label="Show demo or paper figure">
+                <button type="button" class="visual-tab is-active" data-show="demo">Demo</button>
+                <button type="button" class="visual-tab" data-show="figure">Figure</button>
+              </div>
+              <span class="demo-caption">No pixels: light spreads in the ring, SiPMs read the centroid. Move the source.</span>
+            </div>
             <div class="research-body">
               <h3>Monolithic-Ring PET Detectors</h3>
               <p>A preclinical PET detector cut from a single hollow LYSO cylinder (48.5 mm bore, 5 mm wall, 25.1 mm long) with two rings of 46 SiPMs air-coupled to its ends: no pixels, no reflectors, a 100% fill factor and no edges anywhere around the ring. Center-of-gravity and neural-network decoding of the light distribution locate each gamma to 0.94 mm FWHM circumferentially and 2.45 mm axially, with 10.7% energy resolution at 511 keV; a Derenzo phantom resolves 1.2 mm rods. The same ring became a portable gamma sensor, and stacks of sliced rings a full scanner concept.</p>
@@ -305,9 +382,17 @@
           </article>
 
           <article class="card research-card" data-animate>
-            <figure class="research-figure">
-              <img src="assets/figures/sigma-delta-readout.jpg" alt="Circuit diagram of the configurable dual-CDL sigma-delta SiPM readout" loading="lazy" />
-            </figure>
+            <div class="research-visual" data-demo="sigmadelta">
+              <canvas class="research-demo" aria-label="Sigma-delta SiPM readout: each analog pulse becomes a 1-bit stream whose density the FPGA counts as energy."></canvas>
+              <figure class="research-figure">
+                <img src="assets/figures/sigma-delta-readout.jpg" alt="Circuit diagram of the configurable dual-CDL sigma-delta SiPM readout" loading="lazy" />
+              </figure>
+              <div class="visual-tabs" role="group" aria-label="Show demo or paper figure">
+                <button type="button" class="visual-tab is-active" data-show="demo">Demo</button>
+                <button type="button" class="visual-tab" data-show="figure">Figure</button>
+              </div>
+              <span class="demo-caption">SiPM pulse → 1-bit Σ-Δ stream → FPGA counts bits = energy. Click to fire a pulse.</span>
+            </div>
             <div class="research-body">
               <h3>SiPM Readout Electronics</h3>
               <p>Sigma-delta modulation turns each SiPM channel into a 1-bit stream counted in an FPGA, so a 64-channel front end runs from a single 5 V supply at about 3 W with no external ADCs. My configurable dual-CDL design adds two switchable discharge lines: a dual-polarity mode that reads either SiPM polarity in software, and a single-polarity mode with fast baseline restoration and precise charge zeroing for 80–364 keV SPECT signals. On a 50 × 50 × 8 mm CsI:Tl crystal it reaches 7.88% energy resolution at 122 keV against 13.9% for a commercial CAEN V1740 digitizer, with a 63% higher event rate and cleaner pixel separation on the laser-processed array. Earlier work: a 100-channel readout system and an 8.8 ps RMS FPGA time-to-digital converter.</p>
@@ -328,16 +413,27 @@
     <!-- PUBLICATIONS -->
     <section id="publications" class="section view" data-title="Publications" hidden>
       <div class="container">
-        <header class="section-head" data-animate>
-          <a href="#home" class="back-link">← Back to the scanner</a>
-          <span class="section-label">02 — Publications</span>
+        <header class="section-head section-head--station" data-animate>
+          <div class="section-head-text">
+          <span class="section-label">03 · Detector — Publications</span>
           <h2>Publications</h2>
           <p class="section-lede">Peer-reviewed journal articles and conference papers in molecular imaging.</p>
+          </div>
+          <aside class="station-card" data-station="publications"></aside>
         </header>
         <div class="pub-stats" data-animate>
           <div class="stat"><strong id="stat-total">30</strong><span>publications</span></div>
           <div class="stat"><strong id="stat-first">12</strong><span>first-author</span></div>
           <a href="https://scholar.google.com/citations?user=dt6RATUAAAAJ&hl=zh-CN&oi=ao" class="stat-link" target="_blank" rel="noopener">See on Google Scholar →</a>
+        </div>
+        <div class="pub-tools" data-animate>
+          <div class="pub-filters" role="group" aria-label="Filter publications">
+            <button type="button" class="chip is-active" data-filter="all">All</button>
+            <button type="button" class="chip" data-filter="first">First author</button>
+            <button type="button" class="chip" data-filter="journal">Journal</button>
+            <button type="button" class="chip" data-filter="conference">Conference</button>
+          </div>
+          <div class="pub-spectrum" aria-label="Publications per year; click a year to jump to it"></div>
         </div>
         <ol id="pub-list" class="pub-list" aria-live="polite"></ol>
       </div>
@@ -346,12 +442,14 @@
     <!-- CV -->
     <section id="cv" class="section view" data-title="CV" hidden>
       <div class="container">
-        <header class="section-head" data-animate>
-          <a href="#home" class="back-link">← Back to the scanner</a>
-          <span class="section-label">03 — CV</span>
+        <header class="section-head section-head--station" data-animate>
+          <div class="section-head-text">
+          <span class="section-label">04 · Readout — CV</span>
           <h2>Curriculum Vitae</h2>
           <p class="section-lede">Education, appointments, funded projects, editorial roles, and honors. Last updated August 2026.</p>
           <a href="assets/CV-XiZhang.pdf" class="btn btn-primary" download>Download Full CV (PDF) ↓</a>
+          </div>
+          <aside class="station-card" data-station="cv"></aside>
         </header>
 
         <div class="cv-grid">
@@ -418,31 +516,64 @@
     <!-- CONTACT -->
     <section id="contact" class="section view" data-title="Contact" hidden>
       <div class="container">
-        <header class="section-head" data-animate>
-          <a href="#home" class="back-link">← Back to the scanner</a>
-          <span class="section-label">04 — Contact</span>
+        <header class="section-head section-head--station" data-animate>
+          <div class="section-head-text">
+          <span class="section-label">05 · Image — Contact</span>
           <h2>Get in Touch</h2>
-          <p class="section-lede">Open to collaboration on detector engineering, molecular imaging, and laser-processed scintillators.</p>
-        </header>
-        <div class="contact-grid">
-          <a href="mailto:xzhang84@mgh.harvard.edu" class="card contact-card" data-animate>
-            <span class="contact-label">Email</span>
-            <strong>xzhang84@mgh.harvard.edu</strong>
-          </a>
-          <div class="card contact-card" data-animate>
-            <span class="contact-label">Office</span>
-            <strong>149 13th St, Rm 5410<br/>Charlestown, MA 02129</strong>
+          <p class="section-lede">Coincidences become an image; conversations become projects. Open to collaboration on detector engineering, molecular imaging, and laser-processed scintillators.</p>
           </div>
-          <a href="https://sabetlab.mgh.harvard.edu/" target="_blank" rel="noopener" class="card contact-card" data-animate>
-            <span class="contact-label">Lab</span>
-            <strong>Sabet Lab @ NMMI Center →</strong>
-          </a>
+          <aside class="station-card" data-station="contact"></aside>
+        </header>
+        <div class="contact-layout">
+          <div class="contact-main">
+            <div class="contact-grid">
+              <div class="card contact-card" data-animate>
+                <span class="contact-label">Email</span>
+                <a href="mailto:xzhang84@mgh.harvard.edu?subject=Hello%20from%20your%20website" class="contact-value">xzhang84@mgh.harvard.edu</a>
+                <div class="contact-actions">
+                  <a href="mailto:xzhang84@mgh.harvard.edu?subject=Hello%20from%20your%20website" class="btn btn-primary btn-sm">Write an email →</a>
+                  <button type="button" class="btn btn-ghost btn-sm copy-email" data-copy="xzhang84@mgh.harvard.edu">Copy address</button>
+                </div>
+                <p class="contact-note">Boston time now: <span class="local-time">--:--</span>. Expect a reply within a few days.</p>
+              </div>
+              <div class="card contact-card" data-animate>
+                <span class="contact-label">Office</span>
+                <strong>149 13th St, Rm 5410<br/>Charlestown, MA 02129</strong>
+                <p class="contact-note">MGH Charlestown Navy Yard campus · Division of Nuclear Medicine and Molecular Imaging, Department of Radiology.</p>
+                <a href="https://www.google.com/maps/search/?api=1&amp;query=149+13th+St+Charlestown+MA+02129" target="_blank" rel="noopener" class="card-link">Open in Maps ↗</a>
+              </div>
+              <div class="card contact-card" data-animate>
+                <span class="contact-label">Lab</span>
+                <strong>Sabet Lab @ NMMI Center</strong>
+                <p class="contact-note">Hamid Sabet's group at MGH / Harvard Medical School: SPECT and PET instrumentation, from the crystal to the scanner.</p>
+                <a href="https://sabetlab.mgh.harvard.edu/" target="_blank" rel="noopener" class="card-link">sabetlab.mgh.harvard.edu ↗</a>
+              </div>
+            </div>
+            <div class="contact-block" data-animate>
+              <h3 class="cv-col-title">Good reasons to write</h3>
+              <ul class="topic-list">
+                <li><strong>Detector projects.</strong> PET or SPECT detector design, DOI and TOF, laser-processed scintillators, SiPM readout and FPGA firmware.</li>
+                <li><strong>Scanner evaluation.</strong> Phantom studies, detector characterisation on the pencil-beam platform, list-mode MLEM reconstruction.</li>
+                <li><strong>Reviewing and editing.</strong> I review for imaging and instrumentation journals and guest-edit the <em>Symmetry</em> special issue on medical imaging.</li>
+                <li><strong>Visits and students.</strong> Lab visits, talks, and student projects in detector physics and instrumentation.</li>
+              </ul>
+            </div>
+            <div class="contact-block" data-animate>
+              <h3 class="cv-col-title">Elsewhere</h3>
+              <ul class="profile-list">
+                <li><a href="https://scholar.google.com/citations?user=dt6RATUAAAAJ&hl=zh-CN&oi=ao" target="_blank" rel="noopener"><span class="profile-name">Google Scholar</span><span class="profile-meta">every paper, with citations</span></a></li>
+                <li><a href="https://orcid.org/0000-0002-4918-0810" target="_blank" rel="noopener"><span class="profile-name">ORCID</span><span class="profile-meta">0000-0002-4918-0810</span></a></li>
+                <li><a href="https://www.linkedin.com/in/zhang-xi-46b88b29a/" target="_blank" rel="noopener"><span class="profile-name">LinkedIn</span><span class="profile-meta">zhang-xi-46b88b29a</span></a></li>
+              </ul>
+            </div>
+          </div>
+          <aside class="card recon-card" data-animate>
+            <canvas class="recon-canvas" width="220" height="220" aria-label="A portrait of Xi Zhang forming from accumulated counts, the way a PET image forms from coincidences"></canvas>
+            <p class="recon-caption"><span class="recon-count">0</span> counts</p>
+            <p class="recon-lede">Coincidences are reconstructed into an image. Let's build the next one together.</p>
+            <button type="button" class="btn btn-ghost btn-sm recon-restart">Scan again</button>
+          </aside>
         </div>
-        <ul class="social-row" data-animate>
-          <li><a href="https://scholar.google.com/citations?user=dt6RATUAAAAJ&hl=zh-CN&oi=ao" target="_blank" rel="noopener">Google Scholar</a></li>
-          <li><a href="https://orcid.org/0000-0002-4918-0810" target="_blank" rel="noopener">ORCID</a></li>
-          <li><a href="https://www.linkedin.com/in/zhang-xi-46b88b29a/" target="_blank" rel="noopener">LinkedIn</a></li>
-        </ul>
       </div>
     </section>
   </main>
@@ -453,9 +584,26 @@
     </div>
   </footer>
 
+  <div class="bib-modal" hidden>
+    <div class="bib-panel" role="dialog" aria-modal="true" aria-labelledby="bib-title">
+      <div class="bib-head">
+        <strong id="bib-title">BibTeX</strong>
+        <span class="bib-status" aria-live="polite"></span>
+        <button type="button" class="bib-close" aria-label="Close">×</button>
+      </div>
+      <textarea class="bib-text" readonly spellcheck="false" rows="9"></textarea>
+      <div class="bib-foot">
+        <span class="bib-source"></span>
+        <button type="button" class="btn btn-primary bib-copy">Copy to clipboard</button>
+      </div>
+    </div>
+  </div>
   <script src="data/publications.js"></script>
   <script src="assets/main.js"></script>
-  <script src="assets/pet-ring.js"></script>
+  <script src="assets/hero.js"></script>
+  <script src="assets/contact.js"></script>
+  <script src="assets/research-demos.js"></script>
   <script type="module" src="assets/pet-scene.js"></script>
+  <script type="module" src="assets/figure.js"></script>
 </body>
 </html>

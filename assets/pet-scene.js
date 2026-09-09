@@ -41,6 +41,17 @@ async function boot() {
     showFallback();
     return;
   }
+  // Post-processing (bloom) is optional: the room still renders without it.
+  let PP = null;
+  try {
+    const [ec, rp, ub, op] = await Promise.all([
+      import('three/addons/postprocessing/EffectComposer.js'),
+      import('three/addons/postprocessing/RenderPass.js'),
+      import('three/addons/postprocessing/UnrealBloomPass.js'),
+      import('three/addons/postprocessing/OutputPass.js')
+    ]);
+    PP = { EffectComposer: ec.EffectComposer, RenderPass: rp.RenderPass, UnrealBloomPass: ub.UnrealBloomPass, OutputPass: op.OutputPass };
+  } catch (err) { PP = null; }
   const probe = document.createElement('canvas');
   if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) { showFallback(); return; }
 
@@ -72,6 +83,24 @@ async function boot() {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   host.appendChild(renderer.domElement);
+
+  // ---------- Bloom: the bright emissive parts (crystal flashes, LEDs, tracer) glow ----------
+  let composer = null, bloom = null;
+  if (PP) {
+    composer = new PP.EffectComposer(renderer);
+    composer.addPass(new PP.RenderPass(scene, camera));
+    bloom = new PP.UnrealBloomPass(new THREE.Vector2(256, 256), 0.6, 0.5, 0.85);
+    // The bloom blur writes alpha = 1, which would paint the transparent canvas black.
+    // Add the glow to the colour only and leave the alpha channel as the scene rendered it.
+    const blend = bloom.blendMaterial || bloom.materialCopy;
+    if (blend) {
+      blend.blending = THREE.CustomBlending;
+      blend.blendSrc = THREE.OneFactor; blend.blendDst = THREE.OneFactor;
+      blend.blendSrcAlpha = THREE.ZeroFactor; blend.blendDstAlpha = THREE.OneFactor;
+    }
+    composer.addPass(bloom);
+    composer.addPass(new PP.OutputPass());
+  }
 
   const labelRenderer = new CSS2DRenderer();
   labelRenderer.domElement.className = 'scene-labels';
@@ -151,6 +180,11 @@ async function boot() {
     sun.intensity = pal.dark ? 1.1 : 1.7;
     fill.intensity = pal.dark ? 0.25 : 0.4;
     tracerLight.color = c(pal.terra);
+    if (bloom) {
+      bloom.strength = pal.dark ? 0.75 : 0.35;
+      bloom.threshold = pal.dark ? 0.78 : 0.96;
+      bloom.radius = pal.dark ? 0.55 : 0.4;
+    }
   }
 
   // ---------- Floor ----------
@@ -396,8 +430,48 @@ async function boot() {
     if (s) { s.target = 1; s.tip.classList.add('show'); s.dot.classList.add('is-hot'); }
     host.classList.toggle('picking', !!s);
   }
+  // close-up pose on a station, seen from roughly where the camera is now
+  function zoomPose(s, from) {
+    const at = new THREE.Vector3(s.at[0], s.at[1] - 0.12, s.at[2]);
+    const dir = from.clone().sub(at).normalize();
+    dir.y = Math.min(Math.max(dir.y, 0.3), 0.55);
+    const hz = Math.hypot(dir.x, dir.z) || 1;
+    const hs = Math.sqrt(1 - dir.y * dir.y) / hz;
+    dir.x *= hs; dir.z *= hs;
+    return { pos: at.clone().addScaledVector(dir, 2.1), target: at };
+  }
   function open(s) {
-    location.hash = '#' + s.id;
+    if (fly) return;
+    const here = (location.hash.replace('#', '') || 'home') === s.id;
+    if (reduceMotion.matches) { if (!here) location.hash = '#' + s.id; return; }
+    setHover(null);
+    const pose = zoomPose(s, camera.position);
+    if (here) {
+      // the section is this page (the patient → Home): look closer, then settle back
+      flyTo(pose.pos, pose.target, 720, () => setTimeout(() => { if (!fly) flyHome(900); }, 650));
+      return;
+    }
+    // fly the camera to the part first, then open its section
+    zoomed = true;
+    flyTo(pose.pos, pose.target, 720, () => {
+      // the exact frame the visitor is looking at becomes the section's thumbnail,
+      // so the view transition morphs it into place without a visible cut
+      render();
+      const img = document.querySelector('.station-card[data-station="' + s.id + '"] .station-thumb');
+      const go = () => { location.hash = '#' + s.id; };
+      if (!img) { go(); return; }
+      try {
+        thumbCtx.clearRect(0, 0, THUMB_W, THUMB_H);
+        const cw = renderer.domElement.width, chh = renderer.domElement.height;
+        const scale = Math.max(THUMB_W / cw, THUMB_H / chh);
+        const dw = cw * scale, dh = chh * scale;
+        thumbCtx.drawImage(renderer.domElement, (THUMB_W - dw) / 2, (THUMB_H - dh) / 2, dw, dh);
+        img.src = thumbCanvas.toDataURL('image/png');
+        img.hidden = false;
+        img.closest('.station-card').classList.add('has-thumb');
+        (img.decode ? img.decode() : Promise.resolve()).catch(() => {}).then(go);
+      } catch (err) { go(); }
+    });
   }
 
   const raycaster = new THREE.Raycaster();
@@ -544,20 +618,93 @@ async function boot() {
     });
   }
 
+  // ---------- Camera flights: intro fly-in, click-to-open, return home ----------
+  const HOME_TARGET = controls.target.clone();
+  const HOME_DIR = camera.position.clone().sub(HOME_TARGET).normalize();
+  let homeDist = 6.1;
+  let fly = null, zoomed = false;
+  const easeInOut = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const homePosition = () => HOME_TARGET.clone().addScaledVector(HOME_DIR, homeDist);
+  function flyTo(pos, target, dur, done) {
+    fly = { p0: camera.position.clone(), p1: pos.clone(), t0: controls.target.clone(), t1: target.clone(), start: 0, dur, done };
+    controls.enabled = false;
+    controls.autoRotate = false;
+    host.classList.add('flying');
+  }
+  function updateFlight(now) {
+    if (!fly) return;
+    if (!fly.start) fly.start = now;
+    const k = easeInOut(Math.min(1, (now - fly.start) / fly.dur));
+    camera.position.lerpVectors(fly.p0, fly.p1, k);
+    controls.target.lerpVectors(fly.t0, fly.t1, k);
+    camera.lookAt(controls.target);
+    if (k >= 1) {
+      const done = fly.done;
+      fly = null;
+      controls.enabled = true;
+      controls.autoRotate = !reduceMotion.matches && !hovering;
+      host.classList.remove('flying');
+      if (done) done();
+    }
+  }
+  const flyHome = (dur) => { zoomed = false; flyTo(homePosition(), HOME_TARGET, dur); };
+
+  // ---------- Station thumbnails: the close-up of each part, for the section headers ----------
+  const THUMB_W = 400, THUMB_H = 250;
+  const thumbCanvas = document.createElement('canvas');
+  thumbCanvas.width = THUMB_W; thumbCanvas.height = THUMB_H;
+  const thumbCtx = thumbCanvas.getContext('2d');
+  let thumbsDone = false;
+  function makeThumbs() {
+    const w = host.clientWidth, h = host.clientHeight;
+    if (!w || !h) return;
+    const savedPos = camera.position.clone(), savedTarget = controls.target.clone(), savedAspect = camera.aspect;
+    renderer.setSize(THUMB_W, THUMB_H, false);
+    if (composer) composer.setSize(THUMB_W, THUMB_H);
+    camera.aspect = THUMB_W / THUMB_H;
+    camera.updateProjectionMatrix();
+    const thumbs = {};
+    STATIONS.forEach(s => {
+      const pose = zoomPose(s, homePosition());
+      camera.position.copy(pose.pos);
+      camera.lookAt(pose.target);
+      if (composer) composer.render(); else renderer.render(scene, camera);
+      thumbCtx.clearRect(0, 0, THUMB_W, THUMB_H);
+      thumbCtx.drawImage(renderer.domElement, 0, 0, THUMB_W, THUMB_H);
+      thumbs[s.id] = thumbCanvas.toDataURL('image/png');
+    });
+    renderer.setSize(w, h, false);
+    if (composer) composer.setSize(w, h);
+    camera.aspect = savedAspect;
+    camera.updateProjectionMatrix();
+    camera.position.copy(savedPos);
+    controls.target.copy(savedTarget);
+    camera.lookAt(savedTarget);
+    thumbsDone = true;
+    document.dispatchEvent(new CustomEvent('scenethumbs', { detail: thumbs }));
+  }
+
   // ---------- Loop / lifecycle ----------
-  let running = false, rafId = 0, lastTs = 0;
+  let running = false, rafId = 0, lastTs = 0, booted = false;
   const resize = () => {
     const w = host.clientWidth, h = host.clientHeight;
     if (!w || !h) return;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    const dist = 6.1 * Math.max(1, 1.45 / camera.aspect);
-    const off = camera.position.clone().sub(controls.target).setLength(dist);
-    camera.position.copy(controls.target).add(off);
+    homeDist = 6.1 * Math.max(1, 1.45 / camera.aspect);
+    if (!zoomed && !fly) {
+      const off = camera.position.clone().sub(controls.target).setLength(homeDist);
+      camera.position.copy(controls.target).add(off);
+    }
     renderer.setSize(w, h);
+    if (composer) composer.setSize(w, h);
     labelRenderer.setSize(w, h);
+    if (booted && !thumbsDone) { makeThumbs(); render(); }   // first layout after a deep link
   };
-  const render = () => { renderer.render(scene, camera); labelRenderer.render(scene, camera); };
+  const render = () => {
+    if (composer) composer.render(); else renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+  };
   const frame = (now) => {
     if (!running) return;
     const dt = Math.min(now - (lastTs || now), 50);
@@ -566,16 +713,28 @@ async function boot() {
     if (hovered) placeTip(hovered);
     if (!reduceMotion.matches) step(now, dt);
     updateEmphasis(dt);
-    controls.update();
+    updateFlight(now);
+    if (!fly) controls.update();
     render();
     rafId = requestAnimationFrame(frame);
   };
-  const start = () => { if (running) return; running = true; lastTs = 0; nextEventAt = performance.now() + 300; rafId = requestAnimationFrame(frame); };
+  const start = () => {
+    if (zoomed && !fly) { zoomed = false; setTimeout(() => flyTo(homePosition(), HOME_TARGET, 900), 450); }   // back from a section: let the thumbnail grow into the scanner, then pull the camera back
+    if (running) return; running = true; lastTs = 0; nextEventAt = performance.now() + 300; rafId = requestAnimationFrame(frame); };
   const stop = () => { running = false; cancelAnimationFrame(rafId); };
 
   new ResizeObserver(resize).observe(host);
   resize();
   applyPalette();
+  makeThumbs();
+  booted = true;
+  if (!reduceMotion.matches) {
+    // intro: start high and far away, settle into the home framing
+    camera.position.copy(HOME_TARGET).addScaledVector(HOME_DIR, homeDist * 1.9).add(new THREE.Vector3(0.6, 1.4, 0));
+    controls.target.copy(HOME_TARGET).add(new THREE.Vector3(0, 0.3, 0));
+    camera.lookAt(controls.target);
+    flyTo(homePosition(), HOME_TARGET, 1900);
+  }
   render();
   host.classList.add('ready');
   host.hidden = false;
@@ -587,8 +746,8 @@ async function boot() {
   }, { threshold: 0.08 });
   io.observe(host);
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else if (host.getBoundingClientRect().height > 0) start(); });
-  document.addEventListener('themechange', () => { applyPalette(); if (!running) render(); });
-  host.addEventListener('pointerenter', () => { hovering = true; controls.autoRotate = false; });
-  host.addEventListener('pointerleave', () => { hovering = false; controls.autoRotate = !reduceMotion.matches; });
+  document.addEventListener('themechange', () => { applyPalette(); makeThumbs(); if (!running) render(); });
+  host.addEventListener('pointerenter', () => { hovering = true; if (!fly) controls.autoRotate = false; });
+  host.addEventListener('pointerleave', () => { hovering = false; if (!fly) controls.autoRotate = !reduceMotion.matches; });
   controls.addEventListener('change', () => { if (!running) render(); });
 }
