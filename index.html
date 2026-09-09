@@ -10,16 +10,17 @@
   <meta property="og:image" content="assets/profile.jpg" />
   <meta property="og:type" content="website" />
   <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#FFFBF1" />
+  <meta name="theme-color" content="#16120F" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
   <script>
     // Apply saved theme before first paint to avoid a flash.
     (function () {
       try {
         var t = localStorage.getItem("theme");
-        if (t !== "dark" && t !== "light") {
-          t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        }
+        // Dark by default; the toggle remembers the visitor's choice.
+        if (t !== "dark" && t !== "light") t = "dark";
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
@@ -28,11 +29,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
   <header id="site-header">
     <div class="container nav-row">
-      <a href="#home" class="brand"><span class="brand-dot"></span> Xi Zhang</a>
+      <a href="#home" class="brand" aria-label="Xi Zhang, home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle class="bm-ring" cx="16" cy="16" r="12.5" />
+          <path class="bm-hit" d="M23.87 6.93 A12.5 12.5 0 0 1 26.2 9.6" />
+          <path class="bm-hit" d="M8.13 25.07 A12.5 12.5 0 0 1 5.8 22.4" />
+          <line class="bm-lor" x1="24.5" y1="7.5" x2="7.5" y2="24.5" />
+          <circle class="bm-core" cx="16" cy="16" r="2.1" />
+        </svg>
+        <span class="brand-name">Xi<span class="brand-sur">Zhang</span></span>
+      </a>
       <nav id="site-nav" aria-label="Primary">
         <button class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Toggle light / dark">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -64,8 +82,9 @@
   </header>
 
   <main>
-    <!-- HOME / HERO -->
-    <section id="home" class="section hero">
+    <!-- HOME VIEW: hero + 3D scanner (the site map) -->
+    <div id="home" class="view" data-title="Home">
+    <section class="section hero">
       <div class="hero-bg" aria-hidden="true"></div>
       <div class="container hero-grid">
         <div class="hero-left" data-animate>
@@ -97,63 +116,222 @@
       </div>
     </section>
 
+    <!-- MAP: one PET event as the site index -->
+    <section id="map" class="section map-section">
+      <div class="container">
+        <header class="section-head section-head--compact" data-animate>
+          <span class="section-label">Site map · one PET event</span>
+          <h2>Explore the Scanner</h2>
+          <p class="section-lede">One PET event, from subject to image. Drag to orbit · hover a part to see what it stands for · click to open it.</p>
+        </header>
+        <div class="pet-scene" role="img" aria-label="Interactive 3D model of a PET/CT scanner room. Labels on the patient, detector ring, electronics cabinet and workstation link to the sections of this site.">
+          <span class="scene-hint" aria-hidden="true">drag to orbit · hover a part · click to open</span>
+        </div>
+        <nav class="pet-map" aria-label="Site map laid out as a PET signal chain" hidden>
+          <div class="pet-map-track" aria-hidden="true"><span class="pet-map-pulse"></span></div>
+          <ol class="pet-map-stations">
+
+            <li class="station" style="--i:0" data-animate>
+              <a href="#home" data-section="home">
+                <span class="station-disc" aria-hidden="true">
+                  <svg viewBox="0 0 100 100">
+                    <rect class="mk" x="10" y="64" width="80" height="9" rx="3"/>
+                    <line class="mk" x1="18" y1="73" x2="18" y2="82"/>
+                    <line class="mk" x1="82" y1="73" x2="82" y2="82"/>
+                    <circle class="mk" cx="25" cy="52" r="8"/>
+                    <rect class="mk" x="36" y="46" width="50" height="14" rx="7"/>
+                    <circle class="mk-ping" cx="60" cy="53" r="5"/>
+                    <circle class="mk-hot" cx="60" cy="53" r="3.2"/>
+                  </svg>
+                </span>
+                <span class="station-stage">01 · Subject</span>
+                <span class="station-title">Home</span>
+                <span class="station-blurb">Every scan begins with a subject. Begin here: who I am and what I work on.</span>
+                <span class="station-go">Go →</span>
+              </a>
+            </li>
+
+            <li class="station" style="--i:1" data-animate>
+              <a href="#research" data-section="research">
+                <span class="station-disc" aria-hidden="true">
+                  <svg viewBox="0 0 100 100">
+                    <g class="mk mk-teal" transform="translate(50 50) rotate(-32)">
+                      <path d="M7 0 q4 -4.5 8 0 t8 0 t8 0 t8 0"/>
+                      <path d="M33 -4.5 l6 4.5 l-6 4.5"/>
+                    </g>
+                    <g class="mk mk-teal" transform="translate(50 50) rotate(148)">
+                      <path d="M7 0 q4 -4.5 8 0 t8 0 t8 0 t8 0"/>
+                      <path d="M33 -4.5 l6 4.5 l-6 4.5"/>
+                    </g>
+                    <circle class="mk-ping" cx="50" cy="50" r="6"/>
+                    <circle class="mk-hot" cx="50" cy="50" r="4"/>
+                    <text class="mk-text" x="50" y="89" text-anchor="middle">511 keV</text>
+                  </svg>
+                </span>
+                <span class="station-stage">02 · Annihilation</span>
+                <span class="station-title">Research</span>
+                <span class="station-blurb">A positron meets an electron and two 511 keV photons fly apart. The physics behind my research themes.</span>
+                <span class="station-go">Go →</span>
+              </a>
+            </li>
+
+            <li class="station" style="--i:2" data-animate>
+              <a href="#publications" data-section="publications">
+                <span class="station-disc" aria-hidden="true">
+                  <svg viewBox="0 0 100 100">
+                    <circle class="mk-ring" cx="50" cy="50" r="34"/>
+                    <path class="mk-hit" d="M23.96 28.15 A34 34 0 0 1 28.15 23.96"/>
+                    <path class="mk-hit" d="M76.04 71.85 A34 34 0 0 1 71.85 76.04"/>
+                    <line class="mk-lor" x1="29.14" y1="29.14" x2="70.86" y2="70.86"/>
+                    <circle class="mk-hot" cx="43" cy="43" r="3.2"/>
+                  </svg>
+                </span>
+                <span class="station-stage">03 · Detector</span>
+                <span class="station-title">Publications</span>
+                <span class="station-blurb">Scintillator crystals and SiPMs catch each photon. What I have caught so far: peer-reviewed results.</span>
+                <span class="station-go">Go →</span>
+              </a>
+            </li>
+
+            <li class="station" style="--i:3" data-animate>
+              <a href="#cv" data-section="cv">
+                <span class="station-disc" aria-hidden="true">
+                  <svg viewBox="0 0 100 100">
+                    <rect class="mk" x="12" y="22" width="76" height="56" rx="4"/>
+                    <rect class="mk-ink" x="40" y="38" width="24" height="24" rx="2"/>
+                    <g class="mk mk-thin">
+                      <line x1="44" y1="38" x2="44" y2="33"/><line x1="52" y1="38" x2="52" y2="33"/><line x1="60" y1="38" x2="60" y2="33"/>
+                      <line x1="44" y1="62" x2="44" y2="67"/><line x1="52" y1="62" x2="52" y2="67"/><line x1="60" y1="62" x2="60" y2="67"/>
+                      <line x1="40" y1="44" x2="35" y2="44"/><line x1="40" y1="56" x2="35" y2="56"/>
+                      <line x1="64" y1="44" x2="69" y2="44"/><line x1="64" y1="50" x2="69" y2="50"/><line x1="64" y1="56" x2="69" y2="56"/>
+                      <path d="M69 44 h10 v-12 h4"/>
+                      <path d="M69 56 h6 v14 h8"/>
+                    </g>
+                    <path class="mk mk-teal" d="M14 50 h9 l3 -13 l3 13 h11"/>
+                    <text class="mk-text-inv" x="52" y="52.5" text-anchor="middle">FPGA</text>
+                  </svg>
+                </span>
+                <span class="station-stage">04 · Readout</span>
+                <span class="station-title">CV</span>
+                <span class="station-blurb">FPGA readout turns pulses into timestamps and energies. The signal chain behind my work: training, skills, awards.</span>
+                <span class="station-go">Go →</span>
+              </a>
+            </li>
+
+            <li class="station" style="--i:4" data-animate>
+              <a href="#contact" data-section="contact">
+                <span class="station-disc" aria-hidden="true">
+                  <svg viewBox="0 0 100 100">
+                    <rect class="mk" x="12" y="16" width="76" height="54" rx="4"/>
+                    <line class="mk" x1="50" y1="70" x2="50" y2="80"/>
+                    <line class="mk" x1="34" y1="82" x2="66" y2="82"/>
+                    <ellipse class="mk-sand" cx="50" cy="43" rx="24" ry="18"/>
+                    <ellipse class="mk-hot-soft" cx="50" cy="43" rx="15" ry="11"/>
+                    <circle class="mk-hot" cx="44" cy="41" r="4"/>
+                    <path class="mk mk-thin" d="M50 27 v32"/>
+                  </svg>
+                </span>
+                <span class="station-stage">05 · Image</span>
+                <span class="station-title">Contact</span>
+                <span class="station-blurb">Coincidences are reconstructed into an image. Let's build the next one together.</span>
+                <span class="station-go">Go →</span>
+              </a>
+            </li>
+
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    </div>
+
     <!-- RESEARCH -->
-    <section id="research" class="section">
+    <section id="research" class="section view" data-title="Research" hidden>
       <div class="container">
         <header class="section-head" data-animate>
+          <a href="#home" class="back-link">← Back to the scanner</a>
           <span class="section-label">01 — Research</span>
           <h2>Research Themes</h2>
-          <p class="section-lede">Four interlocking threads in molecular imaging instrumentation.</p>
+          <p class="section-lede">I design the detectors that decide what a PET or SPECT scanner can see: the crystal that turns a gamma ray into light, the scanner it sits in, and the electronics that read it out, treated as one system rather than separate parts. Four threads, each with the papers behind it.</p>
         </header>
         <div class="research-grid">
+
           <article class="card research-card" data-animate>
             <figure class="research-figure">
-              <img src="assets/figures/pet-detector.jpg" alt="Dual-layer crystal array CAD render for high-resolution PET" loading="lazy" />
+              <img src="assets/figures/liob-csi-array.jpg" alt="Laser-induced optical barrier process and the fabricated 25 by 25 converging-pixel CsI:Tl crystal array" loading="lazy" />
             </figure>
             <div class="research-body">
-              <h3>PET Detector Design</h3>
-              <p>Time-of-flight (TOF) and depth-of-interaction (DOI) detectors; high-resolution arrays down to 0.35 mm crystal pitch; light-sharing window methods for compact preclinical and clinical scanners.</p>
-              <a href="#publications" class="card-link">Related publications →</a>
+              <h3>Laser-Processed Converging-Pixel CsI:Tl Detectors</h3>
+              <p>A femtosecond laser writes optical barriers inside an intact 50 × 50 × 8 mm CsI:Tl crystal, turning it into a 25 × 25 array with no sawing, no reflectors and 100% process yield. The pixels converge from 1.6 mm at the entrance face to 2 mm at the photodetector, so each pixel axis follows the collimator&rsquo;s line of response and depth-of-interaction parallax disappears without any DOI decoding. A four-axis pencil-beam platform calibrates the detector, and maximum-likelihood decoding resolves every pixel where center-of-gravity fails: 1.00 ± 0.42 mm localization accuracy and 11.8% energy resolution at 122 keV.</p>
+              <ul class="card-papers">
+                <li>Maximum-likelihood position decoding of laser-processed converging-pixel CsI:Tl detectors for high-resolution SPECT · <em>IEEE TRPMS</em>, under review</li>
+                <li><a href="https://doi.org/10.1109/NSS/MIC/RTSD57106.2025.11286546" target="_blank" rel="noopener">Laser-processed CsI:Tl detector with converging pixels</a> · IEEE NSS/MIC 2025</li>
+                <li><a href="https://doi.org/10.1002/mp.17665" target="_blank" rel="noopener">Grooved microstructures on LYSO with a femtosecond laser</a> · Med Phys 2025</li>
+                <li><a href="https://doi.org/10.1109/NSS/MIC42677.2020.9507800" target="_blank" rel="noopener">Femtosecond-laser processing of photonic crystals</a> · IEEE NSS/MIC 2020</li>
+              </ul>
+              <a href="#publications" class="card-link">All publications →</a>
             </div>
           </article>
+
           <article class="card research-card" data-animate>
             <figure class="research-figure">
-              <img src="assets/figures/spect-scanner.jpg" alt="Built PET/SPECT detector showing MSR housing and SiPM array" loading="lazy" />
+              <img src="assets/figures/dc-spect-scanner.jpg" alt="The DC-SPECT scanner gantry with its ring of laser-processed CsI:Tl detector modules" loading="lazy" />
             </figure>
             <div class="research-body">
-              <h3>SPECT Systems</h3>
-              <p>Special-geometry single-photon emission computed tomography systems for cardiac and brain imaging; detector assembly, characterization, and clinical translation at MGH.</p>
-              <a href="#publications" class="card-link">Related publications →</a>
+              <h3>DC-SPECT: A Cardiac-Dedicated SPECT Scanner</h3>
+              <p>Dynamic Cardiac SPECT is a static, body-contouring scanner with about 230° of detector coverage: 80 laser-processed CsI:Tl modules, each behind its own tungsten loft-hole collimator, built for diagnostic and theranostic cardiac imaging. I build and calibrate the modules and produced the scanner&rsquo;s first experimental images. With list-mode MLEM reconstruction, a <sup>57</sup>Co point source and a <sup>99m</sup>Tc triple-line phantom were resolved with FWHM down to 3.55 mm (neural-network decoder) and 4.04 mm (maximum likelihood), comparing MLE and deep-network event positioning under real scanner conditions. The same detector platform serves an NIH-funded dynamic brain SPECT.</p>
+              <ul class="card-papers">
+                <li>First experimental and phantom results of the DC-SPECT scanner · <em>IEEE NSS/MIC 2026</em>, submitted</li>
+                <li><a href="https://doi.org/10.1109/NSS/MIC/RTSD57106.2025.11287406" target="_blank" rel="noopener">Enhancing detector event positioning with L1 regularization</a> · IEEE NSS/MIC 2025</li>
+                <li><a href="https://doi.org/10.1109/NSS/MIC/RTSD57106.2025.11287227" target="_blank" rel="noopener">Modular and robust PET platform for evaluating detectors</a> · IEEE NSS/MIC 2025</li>
+              </ul>
+              <a href="#publications" class="card-link">All publications →</a>
             </div>
           </article>
+
           <article class="card research-card" data-animate>
             <figure class="research-figure">
-              <img src="assets/figures/laser-crystal.jpg" alt="Flood map of laser-processed scintillator crystal with BaSO4 reflector" loading="lazy" />
+              <img src="assets/figures/msr-detector.jpg" alt="Monolithic LYSO scintillator ring with its two rings of SiPM sensor boards" loading="lazy" />
             </figure>
             <div class="research-body">
-              <h3>Laser Processing of Crystals</h3>
-              <p>Femtosecond-laser micro-structuring of LYSO and CsI:Tl scintillator crystals; engineering optical reflectance to enhance light transport and suppress inter-crystal cross-talk.</p>
-              <a href="#publications" class="card-link">Related publications →</a>
+              <h3>Monolithic-Ring PET Detectors</h3>
+              <p>A preclinical PET detector cut from a single hollow LYSO cylinder (48.5 mm bore, 5 mm wall, 25.1 mm long) with two rings of 46 SiPMs air-coupled to its ends: no pixels, no reflectors, a 100% fill factor and no edges anywhere around the ring. Center-of-gravity and neural-network decoding of the light distribution locate each gamma to 0.94 mm FWHM circumferentially and 2.45 mm axially, with 10.7% energy resolution at 511 keV; a Derenzo phantom resolves 1.2 mm rods. The same ring became a portable gamma sensor, and stacks of sliced rings a full scanner concept.</p>
+              <ul class="card-papers">
+                <li><a href="https://doi.org/10.1088/1361-6560/ab2ca4" target="_blank" rel="noopener">A preclinical PET detector constructed with a monolithic scintillator ring</a> · Phys Med Biol 2019</li>
+                <li><a href="https://doi.org/10.1109/NSS/MIC42101.2019.9059816" target="_blank" rel="noopener">Preclinical PET scanner from stacks of sliced monolithic rings</a> · IEEE NSS/MIC 2019</li>
+                <li><a href="https://doi.org/10.3390/s21103376" target="_blank" rel="noopener">Portable gamma sensor from a monolithic LYSO ring</a> · Sensors 2021</li>
+                <li><a href="https://doi.org/10.1109/NSS/MIC42677.2020.9508071" target="_blank" rel="noopener">Two readout methods for a monolithic scintillator ring PET</a> · IEEE NSS/MIC 2020</li>
+              </ul>
+              <a href="#publications" class="card-link">All publications →</a>
             </div>
           </article>
+
           <article class="card research-card" data-animate>
             <figure class="research-figure">
-              <img src="assets/figures/readout-board.jpg" alt="FPGA-based readout board for multi-channel detector readout" loading="lazy" />
+              <img src="assets/figures/sigma-delta-readout.jpg" alt="Circuit diagram of the configurable dual-CDL sigma-delta SiPM readout" loading="lazy" />
             </figure>
             <div class="research-body">
-              <h3>Electronic Readout</h3>
-              <p>FPGA-based high-channel-count readout (100+ channels); time-to-digital converters with picosecond resolution; modular and robust platforms for evaluating detector configurations.</p>
-              <a href="#publications" class="card-link">Related publications →</a>
+              <h3>SiPM Readout Electronics</h3>
+              <p>Sigma-delta modulation turns each SiPM channel into a 1-bit stream counted in an FPGA, so a 64-channel front end runs from a single 5 V supply at about 3 W with no external ADCs. My configurable dual-CDL design adds two switchable discharge lines: a dual-polarity mode that reads either SiPM polarity in software, and a single-polarity mode with fast baseline restoration and precise charge zeroing for 80–364 keV SPECT signals. On a 50 × 50 × 8 mm CsI:Tl crystal it reaches 7.88% energy resolution at 122 keV against 13.9% for a commercial CAEN V1740 digitizer, with a 63% higher event rate and cleaner pixel separation on the laser-processed array. Earlier work: a 100-channel readout system and an 8.8 ps RMS FPGA time-to-digital converter.</p>
+              <ul class="card-papers">
+                <li>A configurable dual-CDL sigma-delta readout circuit for CsI:Tl SPECT · <em>IEEE NSS/MIC 2026</em>, submitted</li>
+                <li><a href="https://doi.org/10.1109/TIM.2018.2877952" target="_blank" rel="noopener">An advanced 100-channel readout system for nuclear imaging</a> · IEEE TIM 2019</li>
+                <li><a href="https://doi.org/10.3390/s20082172" target="_blank" rel="noopener">8.8 ps RMS FPGA time-to-digital converter</a> · Sensors 2020</li>
+                <li><a href="https://doi.org/10.1109/TRPMS.2020.2981388" target="_blank" rel="noopener">Compensating time-walk errors in PET timing</a> · IEEE TRPMS 2020</li>
+              </ul>
+              <a href="#publications" class="card-link">All publications →</a>
             </div>
           </article>
+
         </div>
       </div>
     </section>
 
     <!-- PUBLICATIONS -->
-    <section id="publications" class="section">
+    <section id="publications" class="section view" data-title="Publications" hidden>
       <div class="container">
         <header class="section-head" data-animate>
+          <a href="#home" class="back-link">← Back to the scanner</a>
           <span class="section-label">02 — Publications</span>
           <h2>Publications</h2>
           <p class="section-lede">Peer-reviewed journal articles and conference papers in molecular imaging.</p>
@@ -168,12 +346,13 @@
     </section>
 
     <!-- CV -->
-    <section id="cv" class="section">
+    <section id="cv" class="section view" data-title="CV" hidden>
       <div class="container">
         <header class="section-head" data-animate>
+          <a href="#home" class="back-link">← Back to the scanner</a>
           <span class="section-label">03 — CV</span>
           <h2>Curriculum Vitae</h2>
-          <p class="section-lede">Education, research positions, skills, and honors.</p>
+          <p class="section-lede">Education, appointments, funded projects, editorial roles, and honors. Last updated August 2026.</p>
           <a href="assets/CV-XiZhang.pdf" class="btn btn-primary" download>Download Full CV (PDF) ↓</a>
         </header>
 
@@ -181,19 +360,29 @@
           <div data-animate>
             <h3 class="cv-col-title">Education</h3>
             <ol class="timeline">
-              <li><span class="t-date">09/2016 – 12/2022</span><div class="t-body"><strong>Ph.D. in Mechanical Electronics</strong><br/>Huazhong University of Science and Technology, China<br/><em>Advisor: Prof. Jianfeng Xu</em></div></li>
-              <li><span class="t-date">09/2012 – 06/2016</span><div class="t-body"><strong>B.S. in Mechanical Engineering</strong><br/>Huazhong University of Science and Technology, China</div></li>
+              <li><span class="t-date">09/2016 – 12/2022</span><div class="t-body"><strong>Ph.D. in Mechatronic Engineering</strong><br/>Huazhong University of Science and Technology, Wuhan, China<br/><em>Advisor: Prof. Jianfeng Xu</em><br/><em>Thesis: High-precision Positioning of Gamma Photons in Positron Emission Tomography Detectors</em></div></li>
+              <li><span class="t-date">09/2012 – 06/2016</span><div class="t-body"><strong>B.S. in Mechanical Engineering</strong><br/>Huazhong University of Science and Technology, Wuhan, China</div></li>
             </ol>
           </div>
 
           <div data-animate>
-            <h3 class="cv-col-title">Research Experience</h3>
+            <h3 class="cv-col-title">Appointments</h3>
             <ol class="timeline">
-              <li><span class="t-date">09/2023 – present</span><div class="t-body"><strong>Research Fellow</strong><br/>Massachusetts General Hospital / Harvard Medical School</div></li>
-              <li><span class="t-date">09/2020 – 09/2021</span><div class="t-body"><strong>Visiting Scholar</strong><br/>Institute of Biomedical Engineering, Shenzhen Bay Laboratory, China<br/><em>Supervisors: Dr. Qiyu Peng, Prof. Qiushi Ren</em></div></li>
-              <li><span class="t-date">09/2017 – 03/2018</span><div class="t-body"><strong>Visiting Scholar</strong><br/>Molecular Biophysics and Integrated Bioimaging, Lawrence Berkeley National Laboratory, USA<br/><em>Supervisors: Dr. Qiyu Peng, Prof. Thomas F. Budinger</em></div></li>
+              <li><span class="t-date">09/2023 – present</span><div class="t-body"><strong>Research Fellow</strong><br/>Division of Nuclear Medicine and Molecular Imaging, Department of Radiology<br/>Massachusetts General Hospital / Harvard Medical School, Boston, MA<br/><em>Mentor: Dr. Hamid Sabet</em></div></li>
+              <li><span class="t-date">09/2020 – 09/2021</span><div class="t-body"><strong>Visiting Scholar</strong><br/>Institute of Biomedical Engineering, Shenzhen Bay Laboratory, Shenzhen, China<br/><em>Supervisor: Dr. Qiyu Peng</em></div></li>
+              <li><span class="t-date">09/2017 – 03/2018</span><div class="t-body"><strong>Visiting Scholar</strong><br/>Molecular Biophysics and Integrated Bioimaging, Lawrence Berkeley National Laboratory, Berkeley, CA<br/><em>Supervisors: Dr. Qiyu Peng, Dr. Thomas F. Budinger</em></div></li>
             </ol>
           </div>
+        </div>
+
+        <div class="cv-block" data-animate>
+          <h3 class="cv-col-title">Funded Projects</h3>
+          <ol class="timeline grants">
+            <li><span class="t-date">Submitted</span><div class="t-body"><strong>High-Resolution Laser-Engineered Continuous-Crystal PET: From Small Animal to Brain Imaging</strong><br/>NIH / NIBIB K99/R00 · Principal Investigator · under review<br/><em>Laser-engineered continuous-crystal PET detectors with high spatial resolution and depth-of-interaction capability, carried from small-animal imaging toward human brain imaging.</em></div></li>
+            <li><span class="t-date">09/2023 – 08/2027</span><div class="t-body"><strong>High-Performance SPECT for Dynamic Brain Imaging</strong><br/>NIH R01EB034785 · Research Fellow (PI: Hamid Sabet)<br/><em>Laser-processed scintillator detectors and FPGA-based readout electronics for dynamic brain SPECT with improved sensitivity and spatial resolution.</em></div></li>
+            <li><span class="t-date">12/2018 – 11/2025</span><div class="t-body"><strong>High-Performance SPECT System for Cardiac Imaging</strong><br/>NIH R01HL145160 · Research Fellow (PI: Hamid Sabet)<br/><em>Detector-module electronics and FPGA-based readout for a high-sensitivity, high-resolution cardiac SPECT system.</em></div></li>
+            <li><span class="t-date">08/2007 – 03/2019</span><div class="t-body"><strong>Exploring the Benefits of Time-of-Flight PET</strong><br/>NIH R01EB006085 · Visiting graduate researcher (PI: Qiyu Peng)<br/><em>Time-of-flight PET detector modules with sub-150 ps coincidence resolving time for the Tachyon-II scanner.</em></div></li>
+          </ol>
         </div>
 
         <div class="cv-block" data-animate>
@@ -201,28 +390,38 @@
           <div class="skills-grid">
             <div><h4>Languages</h4><p>C++ · Python · Verilog HDL</p></div>
             <div><h4>Software</h4><p>MATLAB · Quartus · GEANT4 · Altium Designer · Cadence Allegro · SolidWorks · AutoCAD</p></div>
-            <div><h4>Domain Expertise</h4><p>PET detector design (TOF, DOI) · SPECT systems · scintillator laser processing · FPGA readout</p></div>
+            <div><h4>Domain Expertise</h4><p>Laser processing of scintillators · PET detector design (TOF, DOI) · SPECT systems · FPGA readout</p></div>
           </div>
+        </div>
+
+        <div class="cv-block" data-animate>
+          <h3 class="cv-col-title">Editorial &amp; Service</h3>
+          <ol class="timeline">
+            <li><span class="t-date">2024 – present</span><div class="t-body"><strong>Guest Editor</strong>, <em>Symmetry</em> (MDPI)<br/><em>Special Issue: Symmetric/Asymmetric Study in Medical Imaging</em></div></li>
+            <li><span class="t-date">ongoing</span><div class="t-body"><strong>Reviewer</strong> for journals in medical imaging and instrumentation</div></li>
+          </ol>
         </div>
 
         <div class="cv-block" data-animate>
           <h3 class="cv-col-title">Honors &amp; Awards</h3>
           <ul class="awards">
-            <li><span class="t-date">2021</span> Merit Postgraduate of HUST</li>
-            <li><span class="t-date">2017</span> National Scholarship</li>
-            <li><span class="t-date">2016</span> Outstanding Graduates of HUST</li>
+            <li><span class="t-date">2022</span> Distinguished Graduate, Huazhong University of Science and Technology</li>
+            <li><span class="t-date">2021</span> Merit Postgraduate Student, Huazhong University of Science and Technology</li>
+            <li><span class="t-date">2017</span> National Scholarship (Graduate), Ministry of Education, China</li>
+            <li><span class="t-date">2016</span> Outstanding Graduate, Huazhong University of Science and Technology</li>
             <li><span class="t-date">2014</span> First Prize, "Challenge Cup" National College Student Business Plan Competition</li>
-            <li><span class="t-date">2014</span> National Encouragement Scholarship</li>
-            <li><span class="t-date">2013</span> Merit Student of HUST</li>
+            <li><span class="t-date">2014</span> National Encouragement Scholarship, Ministry of Education, China</li>
+            <li><span class="t-date">2013</span> Merit Student, Huazhong University of Science and Technology</li>
           </ul>
         </div>
       </div>
     </section>
 
     <!-- CONTACT -->
-    <section id="contact" class="section">
+    <section id="contact" class="section view" data-title="Contact" hidden>
       <div class="container">
         <header class="section-head" data-animate>
+          <a href="#home" class="back-link">← Back to the scanner</a>
           <span class="section-label">04 — Contact</span>
           <h2>Get in Touch</h2>
           <p class="section-lede">Open to collaboration on detector engineering, molecular imaging, and laser-processed scintillators.</p>
@@ -259,5 +458,6 @@
   <script src="data/publications.js"></script>
   <script src="assets/main.js"></script>
   <script src="assets/pet-ring.js"></script>
+  <script type="module" src="assets/pet-scene.js"></script>
 </body>
 </html>

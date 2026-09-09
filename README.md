@@ -4,8 +4,11 @@ Single-page academic site built with plain HTML, CSS, and JavaScript. Deploys to
 
 Design notes:
 
-- **Warm light / dark themes.** All colors are CSS variables in `assets/styles.css` (`:root` for light, `:root[data-theme="dark"]` for dark). The sun/moon button in the nav toggles them; the choice is remembered in `localStorage` and the OS preference is used until the visitor picks one.
+- **Warm light / dark themes.** All colors are CSS variables in `assets/styles.css` (`:root` for light, `:root[data-theme="dark"]` for dark). The site opens in dark; the sun/moon button in the nav toggles, and the choice is remembered in `localStorage`.
 - **Animated PET ring.** `assets/pet-ring.js` draws a ring of scintillator crystals around the portrait on a `<canvas>`. Annihilation events emit back-to-back photons that light up the crystals they hit and draw the line of response. Hovering moves the annihilation point to the cursor. Tunable constants are at the top of the file.
+- **3D scanner room.** "Explore the Scanner" opens with an orbitable three.js model of a PET/CT suite (`assets/pet-scene.js`): a semi-transparent gantry with the detector ring inside, patient table, electronics cabinet with cable, and a workstation whose screen accumulates counts into an image. Annihilation events in the patient's head fire photon pairs that flash the crystals they hit, draw the line of response and send a pulse down the cable. Each part of the room is a station for one section: hovering it (or its pulsing dot) lifts and glows the part and shows a tooltip; clicking opens that section. three.js is loaded from jsDelivr through the import map in `index.html`; without WebGL or the CDN the model hides itself and the flat station list below still works. Geometry and colors follow the site theme.
+- **Views.** The landing page is only the hero and the scanner. Research, Publications, CV and Contact are separate views (`.view` elements in `index.html`) switched by the hash router at the top of `assets/main.js`, so `#research` etc. still deep-link and the browser back button works.
+- **PET signal-chain map (fallback).** Hidden unless the 3D scene cannot load; the flat chain lays the site out as one PET event: Subject → Annihilation → Detector → Readout → Image, mapped in order to Home → Research → Publications → CV → Contact. Each station is a link; the current section lights up as you scroll (shared scroll-spy in `assets/main.js`), and a photon pulse travels the chain. The icons are inline SVG in `index.html`, the layout and animation live under "PET signal-chain map" in `assets/styles.css` (switches to a vertical chain under 760px).
 - **Restrained motion.** Cards tilt toward the cursor, buttons and the avatar use a short overshoot spring, publication counts count up on scroll, grid cards reveal with a small stagger. Everything is disabled under `prefers-reduced-motion`.
 
 ## Local preview
@@ -45,6 +48,7 @@ Then open the URL it prints (http://localhost:3000 for `serve`, http://localhost
 | Want to change... | Edit this file |
 |---|---|
 | Bio, headlines, section copy | `index.html` |
+| Map stations (names, blurbs, which section each links to) | `index.html` → `<section id="map">` |
 | Visual styling, layout | `assets/styles.css` |
 | Light / dark color palettes | `assets/styles.css` → `:root` and `:root[data-theme="dark"]` |
 | PET ring animation (speed, event rate, crystal count) | `assets/pet-ring.js` → constants at the top |
@@ -56,11 +60,12 @@ Then open the URL it prints (http://localhost:3000 for `serve`, http://localhost
 
 ```
 .
-├── index.html              # Single page, all 5 sections
+├── index.html              # Single page: hero, PET map index, 5 sections
 ├── assets/
 │   ├── styles.css          # All styles
 │   ├── main.js             # Navigation, theme toggle, animations, publications render
 │   ├── pet-ring.js         # Canvas PET detector ring around the portrait
+│   ├── pet-scene.js        # three.js 3D scanner room (site map)
 │   ├── profile.jpg         # Headshot
 │   ├── CV-XiZhang.pdf      # Downloadable CV
 │   └── favicon.svg

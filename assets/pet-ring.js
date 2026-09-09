@@ -57,6 +57,7 @@
   function resize() {
     const rect = host.getBoundingClientRect();
     size = Math.round(rect.width);
+    if (!size) return;   // hero hidden (another view is open); measured again when shown
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = size * dpr;
     canvas.height = size * dpr;
@@ -213,7 +214,8 @@
   }
 
   function start() {
-    if (running || reduceMotion.matches) return;
+    if (!size) resize();
+    if (running || reduceMotion.matches || !size) return;
     running = true;
     lastTs = performance.now();
     nextEventAt = lastTs + 400;

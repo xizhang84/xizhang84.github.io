@@ -1,28 +1,50 @@
 (function () {
   'use strict';
 
-  // ===== 1. Scroll-spy + sticky header tint =====
+  // ===== 1. Views (hash router) + sticky header tint =====
+  // The landing view is the hero + 3D scanner. Research, Publications, CV
+  // and Contact are separate views, opened by clicking a part of the
+  // scanner (or a nav link); #research etc. still deep-link.
   const header = document.getElementById('site-header');
   const navLinks = Array.from(document.querySelectorAll('.nav-link'));
-  const sections = navLinks
-    .map(link => document.getElementById(link.dataset.section))
-    .filter(Boolean);
+  const mapLinks = () => Array.from(document.querySelectorAll('.pet-map a[data-section]'));
+  const views = Array.from(document.querySelectorAll('.view'));
+  const VIEW_IDS = views.map(v => v.id);
+  const BASE_TITLE = document.title;
+  let currentView = null;
 
   const setActiveNav = (id) => {
-    navLinks.forEach(link => {
+    navLinks.concat(mapLinks()).forEach(link => {
       link.classList.toggle('active', link.dataset.section === id);
     });
   };
 
-  // A section is "active" while it crosses a thin band 40% down the
-  // viewport. Unlike a 50%-visible threshold this also works for
-  // sections taller than the screen (e.g. the publication list).
-  const spy = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) setActiveNav(entry.target.id);
-    });
-  }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
-  sections.forEach(s => spy.observe(s));
+  const showView = (id) => {
+    if (id === currentView) return false;
+    views.forEach(v => { v.hidden = v.id !== id; });
+    const el = document.getElementById(id);
+    el.classList.remove('view-enter');
+    void el.offsetWidth;            // restart the entrance animation
+    el.classList.add('view-enter');
+    currentView = id;
+    document.title = (id === 'home' ? '' : el.dataset.title + ' — ') + BASE_TITLE;
+    setActiveNav(id);
+    return true;
+  };
+
+  const route = () => {
+    const hash = location.hash.replace('#', '');
+    if (hash === 'map') {
+      showView('home');
+      document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    const id = VIEW_IDS.includes(hash) ? hash : 'home';
+    const changed = showView(id);
+    if (changed || id === 'home') window.scrollTo({ top: 0, behavior: changed ? 'instant' : 'smooth' });
+  };
+  window.addEventListener('hashchange', route);
+  route();
 
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 20);
@@ -59,7 +81,7 @@
     document.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
   };
 
-  applyTheme(root.getAttribute("data-theme") || "light", false);
+  applyTheme(root.getAttribute("data-theme") || "dark", false);
 
   if (themeBtn) {
     themeBtn.addEventListener("click", () => {
@@ -69,13 +91,15 @@
     });
   }
 
-  // follow the OS setting until the user picks one explicitly
-  const osDark = window.matchMedia("(prefers-color-scheme: dark)");
-  osDark.addEventListener("change", (e) => {
-    let saved = null;
-    try { saved = localStorage.getItem("theme"); } catch (err) {}
-    if (!saved) applyTheme(e.matches ? "dark" : "light", true);
-  });
+  // ===== 2c. Scanner fallback =====
+  // If the 3D scanner never becomes ready (no WebGL, CDN blocked), show the flat map.
+  const sceneEl = document.querySelector('.pet-scene');
+  const flatMap = document.querySelector('.pet-map');
+  if (sceneEl && flatMap) {
+    setTimeout(() => {
+      if (!sceneEl.classList.contains('ready')) { sceneEl.hidden = true; flatMap.hidden = false; }
+    }, 8000);
+  }
 
   // ===== 3. Entrance animations =====
   const animateObserver = new IntersectionObserver((entries) => {
@@ -87,7 +111,7 @@
     });
   }, { threshold: 0.2 });
   // siblings inside a grid reveal one after another
-  document.querySelectorAll('.research-grid, .contact-grid, .cv-grid, .skills-grid').forEach(grid => {
+  document.querySelectorAll('.pet-map-stations, .research-grid, .contact-grid, .cv-grid, .skills-grid').forEach(grid => {
     Array.from(grid.children).forEach((child, i) => {
       const el = child.matches('[data-animate]') ? child : child.querySelector('[data-animate]');
       if (!el) return;
