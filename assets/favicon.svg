@@ -1,5 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#FFFBF1"/>
-  <circle cx="16" cy="16" r="9" fill="none" stroke="#04A4BA" stroke-width="2"/>
-  <circle cx="16" cy="16" r="3" fill="#C6644D"/>
+  <!-- Xi Zhang: one PET event. Dark warm tile, crystal ring, line of response, two lit crystals. -->
+  <rect width="32" height="32" rx="7" fill="#1C1613"/>
+  <circle cx="16" cy="16" r="11" fill="none" stroke="#9A8B74" stroke-width="3.6" stroke-dasharray="3.2 1.12" stroke-dashoffset="0.56" opacity="0.85"/>
+  <path d="M23.2 8.9 A11 11 0 0 1 25.4 11.4" fill="none" stroke="#2FC4D9" stroke-width="3.9"/>
+  <path d="M8.8 23.1 A11 11 0 0 1 6.6 20.6" fill="none" stroke="#2FC4D9" stroke-width="3.9"/>
+  <line x1="23.5" y1="8.5" x2="8.5" y2="23.5" stroke="#E07A5F" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+  <circle cx="16" cy="16" r="2.6" fill="#E07A5F"/>
 </svg>
