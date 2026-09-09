@@ -52,6 +52,8 @@ The GitHub Actions workflow `.github/workflows/update-publications.yml` runs the
 
 ## Deploy to GitHub Pages
 
+Stylesheet and script URLs in `index.html` carry a `?v=…` query string. Bump it whenever you change `assets/*.css` or `*.js`, otherwise browsers (and GitHub's CDN) keep serving the cached file.
+
 1. Create a new public repository on GitHub named **exactly** `xizhang84.github.io` (root-domain Pages site).
 2. From this folder, run:
 
