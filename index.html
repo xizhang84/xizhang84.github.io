@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,12 +16,16 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
   <script>
     // Apply saved theme before first paint to avoid a flash.
+    // Also drop `no-js`, so the SVG fallback avatar stays hidden unless
+    // figure.js later signals a failure with .figure-scene.fallback.
     (function () {
+      var root = document.documentElement;
+      root.classList.remove("no-js");
       try {
         var t = localStorage.getItem("theme");
         // Dark by default; the toggle remembers the visitor's choice.
         if (t !== "dark" && t !== "light") t = "dark";
-        document.documentElement.setAttribute("data-theme", t);
+        root.setAttribute("data-theme", t);
       } catch (e) {}
     })();
   </script>

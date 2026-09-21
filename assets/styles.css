@@ -401,11 +401,18 @@ p { color: var(--ink-soft); }
 /* 3D figure (assets/figure.js); the SVG avatar below it is the fallback */
 .figure-scene { position: relative; width: 100%; max-width: 480px; height: 340px; }
 .figure-scene canvas { display: block; width: 100% !important; height: 100% !important; }
-.figure-scene:not(.ready) { display: none; }
-.figure-scene.ready ~ .avatar-float { display: none; }
+/* Reserve the space while three.js is loading, but keep the slot blank —
+   no flashing SVG cartoon during the swap. */
+.figure-scene:not(.ready):not(.fallback) { visibility: hidden; }
+.figure-scene.fallback { display: none; }
 @media (max-width: 900px) { .figure-scene { height: 300px; } }
-/* avatar: plain portrait, breathing glow, slow float, small pointer tilt; nothing draws over it */
-.avatar-float { animation: avatar-float 6.5s ease-in-out infinite; }
+/* The SVG cartoon avatar is only a fallback for the illustrated figure —
+   shown when JS is off or when figure.js has explicitly bailed (no WebGL,
+   CDN blocked, texture missing). Otherwise it stays hidden so it never
+   flashes in and out before the 3D figure appears. */
+.avatar-float { display: none; animation: avatar-float 6.5s ease-in-out infinite; }
+.no-js .avatar-float,
+.figure-scene.fallback ~ .avatar-float { display: block; }
 .avatar-wrap {
   --rx: 0deg;
   --ry: 0deg;

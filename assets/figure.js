@@ -18,19 +18,23 @@ const host = document.querySelector('.figure-scene');
 if (host) boot();
 
 async function boot() {
+  // If we can't render the 3D figure, mark the scene as .fallback so the
+  // CSS reveals the inline SVG avatar; otherwise the slot stays reserved
+  // but blank so nothing flashes in before the illustration appears.
+  const bail = () => { host.classList.add('fallback'); };
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   let THREE;
-  try { THREE = await import('three'); } catch (err) { return; }
+  try { THREE = await import('three'); } catch (err) { bail(); return; }
   const probe = document.createElement('canvas');
-  if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) return;
+  if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) { bail(); return; }
 
   // ---------- the illustration ----------
   const loader = new THREE.TextureLoader();
   const loadTex = (url) => new Promise((res, rej) => loader.load(url, res, undefined, rej));
   let tex;
   try { tex = await loadTex('assets/figure.webp'); }
-  catch (err) { try { tex = await loadTex('assets/figure.png'); } catch (err2) { return; } }
+  catch (err) { try { tex = await loadTex('assets/figure.png'); } catch (err2) { bail(); return; } }
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 4;
   const aspect = tex.image.width / tex.image.height;

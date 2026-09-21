@@ -235,12 +235,23 @@
   const guide = home.querySelector('.chain-guide');
   const avatar = hero.querySelector('.avatar-wrap');
   const heroRight = hero.querySelector('.hero-right');
-  if (guide && avatar && heroRight) {
+  if (guide && heroRight) {
+    // Anchor on whichever visual is currently in the hero-right slot: the
+    // 3D figure once it's ready, otherwise the visible SVG avatar. If
+    // neither is laid out yet (still booting), we skip this pass and
+    // re-run when the figure signals ready.
+    const anchorEl = () => {
+      const fig = document.querySelector('.figure-scene.ready');
+      if (fig) return fig;
+      if (avatar && avatar.getBoundingClientRect().width > 0) return avatar;
+      return null;
+    };
     const place = () => {
       const scanner = document.querySelector('.pet-scene:not([hidden])') || document.querySelector('.pet-map:not([hidden])');
-      if (window.innerWidth <= 900 || !scanner || reduceMotion) { guide.hidden = true; return; }
+      const anchor = anchorEl();
+      if (window.innerWidth <= 900 || !scanner || reduceMotion || !anchor) { guide.hidden = true; return; }
       const hr = home.getBoundingClientRect();
-      const av = avatar.getBoundingClientRect();
+      const av = anchor.getBoundingClientRect();
       const right = heroRight.getBoundingClientRect();
       const sc = scanner.getBoundingClientRect();
       if (!hr.height || !sc.height) { guide.hidden = true; return; }
@@ -255,6 +266,8 @@
     new ResizeObserver(place).observe(home);
     window.addEventListener('resize', place);
     document.addEventListener('viewchange', () => setTimeout(place, 50));
+    // Re-place once the 3D figure boots (or bails) so the anchor is right.
+    new MutationObserver(place).observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ['class'] });
     setTimeout(place, 0);
   }
 
