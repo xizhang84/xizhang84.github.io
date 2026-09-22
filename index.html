@@ -304,13 +304,38 @@
           <div class="section-head-text">
           <span class="section-label">02 · Annihilation — Research</span>
           <h2>Research Themes</h2>
-          <p class="section-lede">The crystal, the scanner and the electronics, designed as one system. Four threads, each with the papers behind it.</p>
+          <p class="section-lede">The crystal, the scanner and the electronics, designed as one system. Pick a card.</p>
           </div>
           <aside class="station-card" data-station="research"></aside>
         </header>
-        <div class="research-grid">
-
-          <article class="card research-card" data-animate>
+        <div class="deck" role="tablist" aria-label="Research themes">
+          <button type="button" class="deck-card is-active" role="tab" id="deck-liob" aria-controls="stage-liob" aria-selected="true" data-theme="liob" style="--i:0">
+            <span class="deck-num">01</span>
+            <span class="deck-tag">Crystal</span>
+            <span class="deck-art"><img src="assets/figures/liob-csi-array.jpg" alt="" loading="lazy" /><canvas class="deck-mirror" aria-hidden="true"></canvas></span>
+            <span class="deck-title">Laser-processed CsI:Tl</span>
+          </button>
+          <button type="button" class="deck-card" role="tab" id="deck-dcspect" aria-controls="stage-dcspect" aria-selected="false" data-theme="dcspect" style="--i:1">
+            <span class="deck-num">02</span>
+            <span class="deck-tag">Scanner</span>
+            <span class="deck-art"><img src="assets/figures/dc-spect-scanner.jpg" alt="" loading="lazy" /><canvas class="deck-mirror" aria-hidden="true"></canvas></span>
+            <span class="deck-title">DC-SPECT scanner</span>
+          </button>
+          <button type="button" class="deck-card" role="tab" id="deck-msr" aria-controls="stage-msr" aria-selected="false" data-theme="msr" style="--i:2">
+            <span class="deck-num">03</span>
+            <span class="deck-tag">Detector</span>
+            <span class="deck-art"><img src="assets/figures/msr-detector.jpg" alt="" loading="lazy" /><canvas class="deck-mirror" aria-hidden="true"></canvas></span>
+            <span class="deck-title">Monolithic-ring PET</span>
+          </button>
+          <button type="button" class="deck-card" role="tab" id="deck-sigmadelta" aria-controls="stage-sigmadelta" aria-selected="false" data-theme="sigmadelta" style="--i:3">
+            <span class="deck-num">04</span>
+            <span class="deck-tag">Electronics</span>
+            <span class="deck-art"><img src="assets/figures/sigma-delta-readout.jpg" alt="" loading="lazy" /><canvas class="deck-mirror" aria-hidden="true"></canvas></span>
+            <span class="deck-title">SiPM readout</span>
+          </button>
+        </div>
+        <div class="stage" data-animate>
+<article class="card research-card stage-card is-active" id="stage-liob" role="tabpanel" aria-labelledby="deck-liob" data-theme="liob">
             <div class="research-visual" data-demo="liob">
               <canvas class="research-demo" aria-label="Laser-induced optical barriers: a femtosecond laser writes converging pixel walls into one CsI:Tl crystal; a gamma ray is absorbed and its scintillation light stays inside its pixel until it reaches the SiPMs."></canvas>
               <figure class="research-figure">
@@ -334,7 +359,7 @@
             </div>
           </article>
 
-          <article class="card research-card" data-animate>
+<article class="card research-card stage-card" id="stage-dcspect" role="tabpanel" aria-labelledby="deck-dcspect" data-theme="dcspect" aria-hidden="true">
             <div class="research-visual" data-demo="dcspect">
               <canvas class="research-demo" aria-label="DC-SPECT: 80 collimated CsI:Tl modules on a 230° arc stare at the heart; only photons that pass through a loft hole are counted."></canvas>
               <figure class="research-figure">
@@ -358,7 +383,7 @@
             </div>
           </article>
 
-          <article class="card research-card" data-animate>
+<article class="card research-card stage-card" id="stage-msr" role="tabpanel" aria-labelledby="deck-msr" data-theme="msr" aria-hidden="true">
             <div class="research-visual" data-demo="msr">
               <canvas class="research-demo" aria-label="Monolithic scintillator ring: no pixels; light from each gamma spreads in the crystal and two rings of SiPMs read out the centroid."></canvas>
               <figure class="research-figure">
@@ -382,7 +407,7 @@
             </div>
           </article>
 
-          <article class="card research-card" data-animate>
+<article class="card research-card stage-card" id="stage-sigmadelta" role="tabpanel" aria-labelledby="deck-sigmadelta" data-theme="sigmadelta" aria-hidden="true">
             <div class="research-visual" data-demo="sigmadelta">
               <canvas class="research-demo" aria-label="Sigma-delta SiPM readout: each analog pulse becomes a 1-bit stream whose density the FPGA counts as energy."></canvas>
               <figure class="research-figure">

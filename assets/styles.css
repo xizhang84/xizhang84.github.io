@@ -1155,6 +1155,118 @@ a.contact-card:hover strong { color: var(--teal); }
   text-shadow: 0 0 6px var(--bg-elev), 0 0 2px var(--bg-elev);
 }
 
+/* ============ Research: card deck + stage ============
+   A fanned hand of four small cards (each showing a live mirror of its
+   demo) above one large stage card. Picking a card deals it onto the
+   stage: the old card lifts away, the new one lands and its text rises. */
+.deck {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0;
+  padding: .6rem 0 1.4rem;
+  perspective: 900px;
+}
+.deck-card {
+  --tilt: calc((var(--i) - 1.5) * 3.5deg);
+  --drop: calc((var(--i) - 1.5) * (var(--i) - 1.5) * 4px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 138px;
+  aspect-ratio: 5 / 7;
+  margin: 0 2px;
+  padding: .55rem .6rem .6rem;
+  border-radius: 12px;
+  background: linear-gradient(160deg, var(--paper), var(--bg-elev));
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-md);
+  color: var(--ink-soft);
+  text-align: left;
+  cursor: pointer;
+  transform: rotate(var(--tilt)) translateY(var(--drop));
+  transform-origin: 50% 120%;
+  transition: transform .55s var(--spring), box-shadow .3s ease, border-color .3s ease;
+  z-index: 1;
+}
+.deck-card::before {                      /* thin inner frame like a printed card */
+  content: '';
+  position: absolute; inset: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  pointer-events: none;
+}
+.deck-card:hover { transform: rotate(0deg) translateY(-14px) scale(1.04); box-shadow: var(--shadow-lg); border-color: var(--teal); z-index: 3; }
+.deck-card.is-active {
+  transform: rotate(0deg) translateY(-22px) scale(1.08);
+  border-color: var(--teal);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--teal), 0 0 28px -6px var(--teal);
+  z-index: 2;
+}
+.deck-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+.deck-num { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em; color: var(--teal); }
+.deck-tag {
+  position: absolute; top: .55rem; right: .6rem;
+  font-family: var(--font-mono); font-size: .56rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.deck-art {
+  position: relative;
+  margin: .4rem 0 .45rem;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+}
+.deck-art img, .deck-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.deck-art canvas { opacity: 0; transition: opacity .4s ease; }
+.deck-art canvas.live { opacity: 1; }
+.deck-art:has(canvas.live) img { opacity: 0; }
+.deck-title { font-family: var(--font-head); font-weight: 600; font-size: .82rem; line-height: 1.2; color: var(--ink); margin-top: auto; }
+.deck-card.is-active .deck-title { color: var(--teal); }
+
+.stage { position: relative; perspective: 1400px; }
+.stage-card {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: stretch;
+  transform-origin: 50% 0%;
+}
+/* inactive cards stay laid out (so their demos keep running for the deck mirrors) but invisible */
+.stage-card:not(.is-active) { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
+.stage-card .research-visual { height: 100%; min-height: 320px; aspect-ratio: auto; border-bottom: 0; border-right: 1px solid var(--line); }
+.stage-card .research-body { padding: var(--space-3) var(--space-3) var(--space-3); }
+/* deal-in: the card drops onto the table, then its text rises line by line */
+.stage-card.is-active { animation: deal-in .6s var(--spring) both; }
+@keyframes deal-in {
+  from { opacity: 0; transform: translateY(-26px) scale(.965) rotateX(10deg); }
+  to   { opacity: 1; transform: none; }
+}
+.stage-card.is-active .research-body > * { animation: card-rise .5s var(--spring) both .12s; }
+.stage-card.is-active .research-body > p { animation-delay: .2s; }
+.stage-card.is-active .research-body > .card-papers { animation-delay: .28s; }
+.stage-card.is-active .research-body > .card-link { animation-delay: .36s; }
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (max-width: 900px) {
+  .deck { padding-bottom: 1rem; }
+  .deck-card { width: 104px; margin: 0 1px; padding: .45rem .5rem .5rem; }
+  .deck-tag { display: none; }
+  .deck-title { font-size: .72rem; }
+  .stage-card { grid-template-columns: 1fr; }
+  .stage-card .research-visual { min-height: 0; height: clamp(200px, 56vw, 320px); border-right: 0; border-bottom: 1px solid var(--line); }
+}
+@media (max-width: 480px) {
+  .deck-card { width: 82px; margin: 0; }
+  .deck-art { margin: .3rem 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-card.is-active, .stage-card.is-active .research-body > * { animation: none; }
+}
+
 /* ============ Publications: filters, per-year spectrum, BibTeX ============ */
 .pub-tools {
   display: grid;

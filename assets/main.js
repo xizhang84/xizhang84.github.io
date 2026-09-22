@@ -181,12 +181,86 @@
   });
   document.querySelectorAll('[data-animate]').forEach(el => animateObserver.observe(el));
 
+  // ===== 3a. Research card deck =====
+  const deckEl = document.querySelector('.deck');
+  const stageEl = document.querySelector('.stage');
+  if (deckEl && stageEl) {
+    const deckCards = Array.from(deckEl.querySelectorAll('.deck-card'));
+    const stageCards = Array.from(stageEl.querySelectorAll('.stage-card'));
+    const activate = (theme, focus) => {
+      deckCards.forEach(b => {
+        const on = b.dataset.theme === theme;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+        b.tabIndex = on ? 0 : -1;
+        if (on && focus) b.focus();
+      });
+      stageCards.forEach(s => {
+        const on = s.dataset.theme === theme;
+        s.setAttribute('aria-hidden', on ? 'false' : 'true');
+        if (on) {
+          s.classList.remove('is-active');
+          void s.offsetWidth;                       // restart the deal-in animation
+          s.classList.add('is-active');
+        } else {
+          s.classList.remove('is-active');
+        }
+      });
+      document.dispatchEvent(new CustomEvent('researchtheme', { detail: { theme } }));
+    };
+    deckCards.forEach((b, i) => {
+      b.tabIndex = i === 0 ? 0 : -1;
+      b.addEventListener('click', () => activate(b.dataset.theme, false));
+      b.addEventListener('keydown', (e) => {
+        const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!dir) return;
+        e.preventDefault();
+        const next = deckCards[(i + dir + deckCards.length) % deckCards.length];
+        activate(next.dataset.theme, true);
+      });
+    });
+
+    // each small card shows a live mirror of its demo canvas
+    const mirrors = deckCards.map(b => {
+      const mc = b.querySelector('.deck-mirror');
+      const src = stageEl.querySelector('.stage-card[data-theme="' + b.dataset.theme + '"] canvas.research-demo');
+      return mc && src ? { mc, src, ctx: mc.getContext('2d') } : null;
+    }).filter(Boolean);
+    const researchView = document.getElementById('research');
+    let mirrorTick = 0;
+    let mirrorBg = getComputedStyle(document.documentElement).getPropertyValue('--bg-elev').trim() || '#222';
+    document.addEventListener('themechange', () => { mirrorBg = getComputedStyle(document.documentElement).getPropertyValue('--bg-elev').trim() || '#222'; });
+    const mirrorLoop = () => {
+      requestAnimationFrame(mirrorLoop);
+      if (!researchView || researchView.hidden || document.hidden) return;
+      if ((mirrorTick++ & 1) === 0) return;             // 30 fps is plenty for a thumbnail
+      mirrors.forEach(({ mc, src, ctx }) => {
+        if (!src.width || !src.height) return;
+        const r = mc.getBoundingClientRect();
+        if (!r.width) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const W = Math.round(r.width * dpr), H = Math.round(r.height * dpr);
+        if (mc.width !== W || mc.height !== H) { mc.width = W; mc.height = H; }
+        // cover-fit: crop the middle of the source
+        const sAspect = src.width / src.height, dAspect = W / H;
+        let sw = src.width, sh = src.height, sx = 0, sy = 0;
+        if (sAspect > dAspect) { sw = src.height * dAspect; sx = (src.width - sw) / 2; }
+        else { sh = src.width / dAspect; sy = (src.height - sh) / 2; }
+        ctx.fillStyle = mirrorBg;
+        ctx.fillRect(0, 0, W, H);
+        ctx.drawImage(src, sx, sy, sw, sh, 0, 0, W, H);
+        if (!mc.classList.contains('live')) mc.classList.add('live');
+      });
+    };
+    requestAnimationFrame(mirrorLoop);
+  }
+
   // ===== 3b. Card tilt (pointer devices only) =====
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (finePointer && !reduceMotion) {
     const MAX_TILT = 5; // degrees
-    document.querySelectorAll('.research-card, .contact-card').forEach(card => {
+    document.querySelectorAll('.contact-card').forEach(card => {
       card.classList.add('tilt');
       card.addEventListener('pointerenter', () => card.classList.add('is-tilting'));
       card.addEventListener('pointermove', (e) => {
