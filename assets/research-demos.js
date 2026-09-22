@@ -196,7 +196,8 @@
     const NMOD = 30, COVER = 230 * Math.PI / 180, ACCEPT = 0.085;
     let cx, cy, R, mods, heart, focusPt, photons, septa, emitAcc, total, accepted;
     const reset = () => {
-      cx = S.w * 0.5; cy = S.h * 0.5; R = Math.min(S.w * 0.34, S.h * 0.44);
+      // scene sits below the two label lines at the top-left (y 14 / 28)
+      cx = S.w * 0.5; cy = S.h * 0.58; R = Math.min(S.w * 0.34, S.h * 0.40);
       focusPt = { x: cx - R * 0.16, y: cy + R * 0.04 };
       heart = { x: focusPt.x, y: focusPt.y };
       mods = [];
@@ -254,7 +255,7 @@
       ctx.setLineDash([3, 4]); ctx.strokeStyle = rgba(p.teal, 0.5);
       ctx.beginPath(); ctx.arc(focusPt.x, focusPt.y, R * 0.2, 0, Math.PI * 2); ctx.stroke();
       ctx.setLineDash([]);
-      label(ctx, 'focal region', focusPt.x + R * 0.2 + 6, focusPt.y + 4, rgba(p.teal, 0.8), 'left');
+      label(ctx, 'focal region', focusPt.x, focusPt.y + R * 0.2 + 12, rgba(p.teal, 0.8), 'center');
       // hole axes of a few modules, faint
       ctx.strokeStyle = rgba(p.teal, 0.12);
       mods.forEach((m, i) => { if (i % 3) return; ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(focusPt.x, focusPt.y); ctx.stroke(); });
@@ -373,11 +374,11 @@
   /* ---------------- 4. Sigma-delta SiPM readout ---------------- */
   function makeSigmaDelta(S) {
     const FS = 240, TAU = 0.11, WIN = 12, BINS = 22, BASE = 0.02;
-    let N, xs, ys, rs, head, acc, yPrev, tSim, pulses, hist, nextPulse, primed, winSum, flashes;
+    let N, xs, ys, rs, head, acc, yPrev, tSim, pulses, hist, nextPulse, primed, winCount, winPos, flashes;
     const reset = () => {
       N = Math.max(80, Math.floor(S.w * 0.66 / 1.15));
       xs = new Float32Array(N); ys = new Uint8Array(N); rs = new Float32Array(N);
-      head = 0; acc = 0; yPrev = 0; tSim = 0; winSum = 0;
+      head = 0; acc = 0; yPrev = 0; tSim = 0; winCount = 0; winPos = 0;
       pulses = []; hist = new Float32Array(BINS); nextPulse = 0.5; primed = false; flashes = [];
     };
     const fire = (A) => { pulses.push({ t0: tSim, A, bits: 0, until: tSim + TAU * 5 }); };
@@ -400,9 +401,11 @@
         hist[bin] += 1; flashes.push({ bin, t: tSim });
         return false;
       });
-      // ring buffers + moving-average reconstruction (what the FPGA counter sees)
-      winSum += y - ys[(head - WIN + N) % N];
-      xs[head] = x; ys[head] = y; rs[head] = winSum / WIN;
+      // FPGA counter: add each bit to the window count, latch and reset at the window end
+      winCount += y;
+      xs[head] = x; ys[head] = y; rs[head] = winCount / WIN;
+      winPos = (winPos + 1) % WIN;
+      if (winPos === 0) winCount = 0;
       head = (head + 1) % N;
     };
     const draw = (ctx, now, dt) => {
@@ -429,14 +432,29 @@
       const tw = Math.max(1, sx * 0.7);
       for (let k = 0; k < N; k++) if (ys[idx(k)]) ctx.fillRect(left + k * sx, y0 + laneH * 0.28, tw, laneH * 0.6);
       label(ctx, 'Σ-Δ 1-bit stream · no ADC', left, y0 + 10, p.faint);
-      // lane 3: FPGA bit density
+      // lane 3: FPGA window counter (ramps up with the bit density, resets every WIN samples)
       y0 = lane(2);
+      const base3 = y0 + laneH * 0.9;
+      // window boundaries
+      ctx.strokeStyle = rgba(p.ink, 0.12); ctx.lineWidth = 1;
+      for (let k = 0; k < N; k++) {
+        if ((winPos - (N - k)) % WIN === 0 || (winPos - (N - k) + WIN * 1000) % WIN === 0) {
+          const bx = left + k * sx;
+          ctx.beginPath(); ctx.moveTo(bx, y0 + laneH * 0.18); ctx.lineTo(bx, base3); ctx.stroke();
+        }
+      }
       ctx.beginPath();
-      for (let k = 0; k < N; k++) { const y = y0 + laneH * 0.9 - rs[idx(k)] * laneH * 0.78; k ? ctx.lineTo(left + k * sx, y) : ctx.moveTo(left, y); }
+      let prev = null;
+      for (let k = 0; k < N; k++) {
+        const v = rs[idx(k)], y = base3 - v * laneH * 0.78, xk = left + k * sx;
+        if (prev !== null && v < prev) { ctx.lineTo(xk, base3); }          // counter reset: drop to zero
+        k ? ctx.lineTo(xk, y) : ctx.moveTo(xk, y);
+        prev = v;
+      }
       ctx.strokeStyle = p.sage; ctx.lineWidth = 1.4; ctx.stroke();
-      ctx.lineTo(right, y0 + laneH * 0.9); ctx.lineTo(left, y0 + laneH * 0.9); ctx.closePath();
+      ctx.lineTo(right, base3); ctx.lineTo(left, base3); ctx.closePath();
       ctx.fillStyle = rgba(p.sage, 0.14); ctx.fill();
-      label(ctx, 'FPGA: bits per window', left, y0 + 10, p.faint);
+      label(ctx, 'FPGA: bits per window · reset each window', left, y0 + 10, p.faint);
       // energy spectrum from the counted bits
       const sxp = S.w * 0.71, swp = S.w * 0.27, top = 22, bottom = S.h - 4;
       const maxH = Math.max(1, ...hist);

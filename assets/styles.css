@@ -1450,13 +1450,16 @@ body.modal-open { overflow: hidden; }
   align-items: start;
 }
 .contact-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-.contact-value { font-weight: 600; font-size: 1rem; color: var(--ink); line-height: 1.4; word-break: break-all; }
+.contact-value { font-weight: 600; font-size: 1rem; color: var(--ink); line-height: 1.4; overflow-wrap: anywhere; }
 .contact-value:hover { color: var(--teal); }
 .contact-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .2rem; }
 .btn-sm { padding: .45rem .9rem; font-size: .82rem; }
 .contact-note { font-size: .82rem; line-height: 1.45; color: var(--ink-faint); }
 .contact-card .card-link { margin-top: auto; }
-.local-time { font-family: var(--font-mono); color: var(--teal); }
+.contact-clock { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .5rem; margin-top: .35rem; }
+.clock-label { white-space: nowrap; }
+.local-time { font-family: var(--font-mono); font-size: .8rem; color: var(--teal); white-space: nowrap; }
+.contact-clock + .contact-note { margin-top: -.15rem; }
 .contact-block { margin-top: var(--space-4); }
 .topic-list { display: grid; gap: .6rem; font-size: .95rem; color: var(--ink-soft); }
 .topic-list li { position: relative; padding-left: 1.1rem; line-height: 1.5; }
