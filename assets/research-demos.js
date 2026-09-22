@@ -48,9 +48,7 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
   const MONO = "500 10px 'JetBrains Mono', ui-monospace, Consolas, monospace";
-  let compactNow = false;   // set per frame: strips too narrow for the caption labels
   const label = (ctx, text, x, y, color, align) => {
-    if (compactNow) return;
     ctx.font = MONO; ctx.fillStyle = color; ctx.textAlign = align || 'left'; ctx.textBaseline = 'alphabetic';
     ctx.fillText(text, x, y);
   };
@@ -487,13 +485,12 @@
     const ctx = canvas.getContext('2d');
     const S = { w: 0, h: 0, pal: readPalette(), pointer: null, still: reduceMotion };
     const demo = make(S);
-    let dpr = 1, running = false, raf = 0, last = 0, visible = false, showDemo = true, laidOut = false, settleTimer = 0;
+    let dpr = 1, running = false, raf = 0, last = 0, visible = false, showDemo = true;
 
     const paint = (now, dt) => {
       if (S.w <= 0) return;                 // not laid out yet (view hidden)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, S.w, S.h + CAPTION_H);
-      compactNow = S.w < 250;
       demo.draw(ctx, now, dt);
     };
     const frame = (now) => {
@@ -515,14 +512,8 @@
       canvas.width = Math.round(r.width * dpr);
       canvas.height = Math.round(r.height * dpr);
       S.w = r.width; S.h = r.height - CAPTION_H;
-      if (!laidOut) { laidOut = true; demo.reset(); }
-      else {
-        clearTimeout(settleTimer);
-        settleTimer = setTimeout(() => { demo.reset(); paint(performance.now(), 0); }, 160);
-      }
-      // setting canvas.width above wiped the frame; repaint at once so a
-      // resize that lands after this frame's rAF never leaves the canvas blank
-      paint(performance.now(), 0);
+      demo.reset();
+      if (!running) paint(performance.now(), 0);
       sync();
     };
     new ResizeObserver(resize).observe(canvas);
