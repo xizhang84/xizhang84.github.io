@@ -508,11 +508,7 @@ p { color: var(--ink-soft); }
 .meta-icon { margin-right: .35rem; }
 
 /* ============ Research ============ */
-.research-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3);
-}
+.research-grid { gap: var(--space-3); }
 .research-card {
   display: flex;
   flex-direction: column;
@@ -1046,7 +1042,7 @@ a.contact-card:hover strong { color: var(--teal); }
   .hero-right { order: -1; }
   .avatar { width: 156px; height: 156px; }
   .chain-guide { display: none; }
-  .research-grid, .cv-grid, .skills-grid, .contact-grid { grid-template-columns: 1fr; }
+  .cv-grid, .skills-grid, .contact-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
@@ -1153,6 +1149,70 @@ a.contact-card:hover strong { color: var(--teal); }
   color: var(--ink-faint);
   pointer-events: none;
   text-shadow: 0 0 6px var(--bg-elev), 0 0 2px var(--bg-elev);
+}
+
+/* ============ Research: spotlight cards ============
+   One card is open (demo + text + papers); the others collapse to a
+   narrow strip that keeps its live demo running. Clicking a strip
+   opens it and the row re-flows with a spring. Under 900px the row
+   becomes an accordion. */
+.research-grid {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+.research-grid .research-card {
+  flex: 1 1 0;
+  min-width: 0;
+  cursor: pointer;
+  transition: flex-grow .7s var(--spring), transform .5s var(--spring), box-shadow .25s ease, border-color .25s ease;
+}
+.research-grid .research-card.is-tilting { transition: flex-grow .7s var(--spring), transform .12s ease-out, box-shadow .25s ease, border-color .25s ease; }
+.research-grid .research-card.is-open { flex-grow: 3.1; cursor: default; }
+.research-grid .research-card:not(.is-open):hover { flex-grow: 1.25; border-color: var(--teal); }
+.research-grid .research-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+.research-grid .research-visual { height: clamp(220px, 26vw, 320px); aspect-ratio: auto; flex: none; }
+.research-grid .visual-tabs, .research-grid .demo-caption { transition: opacity .3s ease; }
+.research-card:not(.is-open) .visual-tabs,
+.research-card:not(.is-open) .demo-caption { opacity: 0; pointer-events: none; }
+/* body: open shows everything with a staggered rise; collapsed shows index + short title + hint */
+.research-body { position: relative; }
+.research-card:not(.is-open) .research-body { padding: var(--space-2) var(--space-2) var(--space-3); gap: .35rem; }
+.research-card:not(.is-open) .research-body > :not(.short-title):not(.open-hint):not(.card-index) { display: none; }
+.card-index { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .14em; color: var(--teal); }
+.short-title { font-family: var(--font-head); font-weight: 600; font-size: 1rem; line-height: 1.25; color: var(--ink); }
+.open-hint {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color .2s ease, transform .35s var(--spring);
+}
+.research-card:not(.is-open):hover .open-hint { color: var(--teal); transform: translateX(3px); }
+.research-card.is-open .card-index,
+.research-card.is-open .short-title,
+.research-card.is-open .open-hint { display: none; }
+.research-card.is-open .research-body > * { animation: card-rise .55s var(--spring) both; }
+.research-card.is-open .research-body > p { animation-delay: .07s; }
+.research-card.is-open .research-body > .card-papers { animation-delay: .14s; }
+.research-card.is-open .research-body > .card-link { animation-delay: .21s; }
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (max-width: 900px) {
+  .research-grid { flex-direction: column; gap: var(--space-2); }
+  .research-grid .research-card, .research-grid .research-card.is-open, .research-grid .research-card:not(.is-open):hover { flex: none; }
+  .research-grid .research-visual { height: 0; border-bottom: 0; transition: height .55s var(--spring); }
+  .research-grid .research-card.is-open .research-visual { height: clamp(200px, 56vw, 300px); border-bottom: 1px solid var(--line); }
+  .research-card:not(.is-open) .research-body { flex-direction: row; align-items: center; gap: .8rem; padding: .85rem var(--space-3); }
+  .research-card:not(.is-open) .short-title { flex: 1; font-size: 1.02rem; }
+  .research-card:not(.is-open) .open-hint { margin-top: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .research-card.is-open .research-body > * { animation: none; }
 }
 
 /* ============ Publications: filters, per-year spectrum, BibTeX ============ */

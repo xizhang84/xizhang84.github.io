@@ -181,6 +181,42 @@
   });
   document.querySelectorAll('[data-animate]').forEach(el => animateObserver.observe(el));
 
+  // ===== 3a. Research spotlight cards =====
+  const researchGrid = document.querySelector('.research-grid');
+  if (researchGrid) {
+    const cards = Array.from(researchGrid.querySelectorAll('.research-card'));
+    const openCard = (card) => {
+      cards.forEach(c => c.classList.toggle('is-open', c === card));
+      document.dispatchEvent(new CustomEvent('researchopen', { detail: { card } }));
+    };
+    cards.forEach((card, i) => {
+      const body = card.querySelector('.research-body');
+      const idx = document.createElement('span');
+      idx.className = 'card-index';
+      idx.textContent = card.dataset.index || String(i + 1).padStart(2, '0');
+      const short = document.createElement('span');
+      short.className = 'short-title';
+      short.textContent = card.dataset.short || card.querySelector('h3').textContent;
+      const hint = document.createElement('span');
+      hint.className = 'open-hint';
+      hint.textContent = 'Open →';
+      body.prepend(short); body.prepend(idx); body.appendChild(hint);
+      card.setAttribute('tabindex', '0');
+      card.classList.toggle('is-open', i === 0);
+      card.addEventListener('click', (e) => {
+        if (card.classList.contains('is-open')) return;
+        if (e.target.closest('a, button')) return;
+        openCard(card);
+      });
+      card.addEventListener('keydown', (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target === card && !card.classList.contains('is-open')) {
+          e.preventDefault();
+          openCard(card);
+        }
+      });
+    });
+  }
+
   // ===== 3b. Card tilt (pointer devices only) =====
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
